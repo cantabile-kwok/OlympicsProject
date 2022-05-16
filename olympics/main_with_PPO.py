@@ -8,6 +8,7 @@ import argparse
 from agent import *
 import time
 from scenario.running import Running
+from rl_trainer.algo.ppo import PPO
 
 
 import random
@@ -33,13 +34,29 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--map", default="map4", type=str, help="map1/map2/map3/map4")
     parser.add_argument("--seed", default=1, type=int)
+    parser.add_argument("--my_ai_run_dir", default="")
+    parser.add_argument("--my_ai_run_episode", default=0)
+    parser.add_argument(
+        "--my_ai",
+        default="ppo",
+        help="[your algo name]/random",
+        choices=["ppo", "random"],
+    )
+
     args = parser.parse_args()
 
     random.seed(args.seed)
     np.random.seed(args.seed)
 
-    agent1 = random_agent()
+    # agent1 = random_agent()
     agent2 = random_agent()
+
+    algo_name_list = ["ppo", "random"]
+    algo_list = [PPO, random_agent]
+    algo_map = dict(zip(algo_name_list, algo_list))
+
+    agent1 = algo_map[args.my_ai]()
+    agent1.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
     # agent3 = random_agent()
 
 
@@ -68,11 +85,15 @@ if __name__ == "__main__":
         while not done:
             step += 1
 
-            action1 = agent1.act(obs[0])
+            action1 = agent1.choose_action(obs[0].flatten(), train=False)
+            from evaluation import actions_map
+            action1 = actions_map[action1]
             action2 = agent2.act(obs[1])
             # action2 = agent2.act(obs[1])
 
             obs, reward, done, _ = game.step([action1, action2])
+            print("Action:", action1)
+            print('-' * 89)
 
             if RENDER:
                 game.render()
