@@ -24,4 +24,7 @@ python evaluation.py --my_ai ppo --my_ai_run_dir run1 --my_ai_run_episode 1500 -
 3. For training a ppo algorithm, the given metrics may not be enough, you can add other metrics, e.g. clipping ratio, to help monitoring the training process.
 4. Single-agent PPO may not work in difficult maps, and you should train your agent with `--shuffle_map` flag finally.
 
+---
+in the gyw branch
+
 
