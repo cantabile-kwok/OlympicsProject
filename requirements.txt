@@ -1,0 +1,16 @@
+certifi
+cycler
+kiwisolver
+matplotlib
+numpy
+Pillow
+pygame
+pyparsing
+python-dateutil
+six
+wincertstore
+torch
+pyyaml
+tensorboard
+gym
+tabulate
