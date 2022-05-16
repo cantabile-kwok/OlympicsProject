@@ -11,10 +11,10 @@ git clone https://github.com/Leo-xh/Competition_Olympics-Running.git
 cd Competition_Olympics-Running
 
 # training ppo with random opponent
-python rl_trainer/main.py --device cuda --map 1
+python rl_trainer/main.py --device cuda --map 1  # 可以用不同的map，或者用--shuffle_map
 
 # evaluating ppo with random opponent
-python evaluation.py --my_ai ppo --my_ai_run_dir run1 --my_ai_run_episode 1500 --map 1
+python evaluation.py --my_ai ppo --my_ai_run_dir run1 --my_ai_run_episode 1500 --map 1  # run1可以改成自己的output directory
 ```
 
 ### Suggestions
@@ -25,4 +25,3 @@ python evaluation.py --my_ai ppo --my_ai_run_dir run1 --my_ai_run_episode 1500 -
 4. Single-agent PPO may not work in difficult maps, and you should train your agent with `--shuffle_map` flag finally.
 
 
-This is added by gyw again
