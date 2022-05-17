@@ -134,11 +134,11 @@ if __name__ == "__main__":
         default="all",
     )
     parser.add_argument("--render", type=bool, default=True)
-    parser.add_argument("--seed", default=3)
+    parser.add_argument("--seed", default=100)
     args = parser.parse_args()
 
     env_type = "olympics-running"
-    game = make(env_type, conf=None, seed=1)
+    game = make(env_type, conf=None, seed=args.seed)
 
     if args.map != "all":
         game.specify_a_map(int(args.map))
@@ -155,14 +155,14 @@ if __name__ == "__main__":
         agent.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
         agent_list.append(agent)
     else:
-        agent_list.append(random_agent())
+        agent_list.append(random_agent(args.seed))
 
     if args.opponent != "random":
         agent = algo_map[args.opponent]()
         agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
         agent_list.append(agent)
     else:
-        agent_list.append(random_agent())
+        agent_list.append(random_agent(args.seed))
 
     # NOTE: [our ai, random]
 

@@ -10,7 +10,6 @@ import time
 from scenario.running import Running
 from rl_trainer.algo.ppo import PPO
 
-
 import random
 import numpy as np
 import matplotlib.pyplot as plt
