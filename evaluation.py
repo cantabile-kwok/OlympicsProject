@@ -133,8 +133,8 @@ if __name__ == "__main__":
         "--map",
         default="all",
     )
-    parser.add_argument("--render", type=bool, default=False)
-    parser.add_argument("--seed", default=0)
+    parser.add_argument("--render", type=bool, default=True)
+    parser.add_argument("--seed", default=3)
     args = parser.parse_args()
 
     env_type = "olympics-running"
@@ -146,20 +146,25 @@ if __name__ == "__main__":
     else:
         shuffle = True
 
-    algo_list = [args.opponent, args.my_ai]  # your are controlling agent green
+    algo_list = [args.my_ai, args.opponent]  # your are controlling agent purple
+
     agent_list = []
-    if args.opponent != "random":
-        agent = algo_map[args.opponent]()
-        agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
-        agent_list.append(agent)
-    else:
-        agent_list.append(random_agent())
+
     if args.my_ai != "random":
         agent = algo_map[args.my_ai]()
         agent.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
         agent_list.append(agent)
     else:
         agent_list.append(random_agent())
+
+    if args.opponent != "random":
+        agent = algo_map[args.opponent]()
+        agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
+        agent_list.append(agent)
+    else:
+        agent_list.append(random_agent())
+
+    # NOTE: [our ai, random]
 
     run_game(
         game,

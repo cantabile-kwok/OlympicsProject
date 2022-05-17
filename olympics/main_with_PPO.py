@@ -54,14 +54,16 @@ if __name__ == "__main__":
 
     algo_name_list = ["ppo", "random"]
     algo_list = [PPO, random_agent]
+    # algo_list = [, random_agent, ]
+
     algo_map = dict(zip(algo_name_list, algo_list))
 
     agent1 = algo_map[args.my_ai]()
     agent1.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
-    # agent3 = random_agent()
 
     map_index_seq = list(range(1, 5))
     time_s = time.time()
+
     for i in range(20):
         print("==========================================")
         if args.map_index is not None:
