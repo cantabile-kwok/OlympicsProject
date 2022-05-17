@@ -42,6 +42,7 @@ if __name__ == "__main__":
         help="[your algo name]/random",
         choices=["ppo", "random"],
     )
+    parser.add_argument("--map_index", default=None, type=int)
 
     args = parser.parse_args()
 
@@ -59,15 +60,18 @@ if __name__ == "__main__":
     agent1.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
     # agent3 = random_agent()
 
-
     map_index_seq = list(range(1, 5))
     time_s = time.time()
     for i in range(20):
         print("==========================================")
-        ind = map_index_seq.pop(0)
+        if args.map_index is not None:
+            ind = args.map_index
+        else:
+            ind = map_index_seq.pop(0)
+            map_index_seq.append(ind)
+
         print("map index: ", ind)
         Gamemap = create_scenario("map" + str(ind))
-        map_index_seq.append(ind)
 
         rnd_seed = random.randint(0, 1000)
         game = Running(Gamemap, seed=rnd_seed)
