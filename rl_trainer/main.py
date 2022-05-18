@@ -107,6 +107,9 @@ def get_args():
     parser.add_argument("--load_episode", default=900, type=int)
     parser.add_argument("--run_dir", type=str, help='Running directory name (for experiments)')
 
+    parser.add_argument('--actor_hidden_layers', type=int, default=2)
+    parser.add_argument('--critic_hidden_layers', type=int, default=2)
+
     return parser.parse_args()
 
 
@@ -169,7 +172,9 @@ def main(args):
         load_dir = os.path.join(os.path.dirname(run_dir), "run" + str(args.load_run))
         model.load(load_dir, episode=args.load_episode)
     else:
-        model = PPO(args.device, run_dir, writer)  # model is the controlled agent
+        model = PPO(args.device, run_dir, writer,
+                    actor_hidden_layers=args.actor_hidden_layers,
+                    critic_hidden_layers=args.critic_hidden_layers)  # model is the controlled agent
         Transition = namedtuple(
             "Transition",
             ["state", "action", "a_log_prob", "reward", "next_state", "done"],

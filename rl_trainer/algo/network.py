@@ -23,12 +23,26 @@ class CNN_encoder(nn.Module):
 
 
 class Actor(nn.Module):
-    def __init__(self, state_space, action_space, hidden_size=64, cnn=False):
+    def __init__(self, state_space, action_space,
+                 hidden_size=64,
+                 cnn=False,
+                 hidden_layers=1):
         super(Actor, self).__init__()
         self.is_cnn = cnn
         if self.is_cnn:
             self.encoder = CNN_encoder()
-        self.linear_in = nn.Linear(state_space, hidden_size)
+
+        if hidden_layers == 1:
+            self.linear_in = nn.Linear(state_space, hidden_size)
+        else:
+            self.linear_in = [nn.Linear(state_space, hidden_size)]
+
+            for i in range(hidden_layers - 1):
+                self.linear_in.append(nn.ReLU())
+                self.linear_in.append(nn.Linear(hidden_size, hidden_size))
+
+            self.linear_in = nn.Sequential(*self.linear_in)
+
         self.action_head = nn.Linear(hidden_size, action_space)
 
     def forward(self, x):
@@ -40,12 +54,22 @@ class Actor(nn.Module):
 
 
 class Critic(nn.Module):
-    def __init__(self, state_space, hidden_size=64, cnn=False):
+    def __init__(self, state_space, hidden_size=64, cnn=False, hidden_layers=1):
         super(Critic, self).__init__()
         self.is_cnn = cnn
         if self.is_cnn:
             self.encoder = CNN_encoder()
-        self.linear_in = nn.Linear(state_space, hidden_size)
+
+        if hidden_layers == 1:
+            self.linear_in = nn.Linear(state_space, hidden_size)
+        else:
+            self.linear_in = [nn.Linear(state_space, hidden_size)]
+
+            for i in range(hidden_layers - 1):
+                self.linear_in.append(nn.ReLU())
+                self.linear_in.append(nn.Linear(hidden_size, hidden_size))
+
+            self.linear_in = nn.Sequential(*self.linear_in)
         self.state_value = nn.Linear(hidden_size, 1)
 
     def forward(self, x):

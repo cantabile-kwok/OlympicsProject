@@ -29,6 +29,8 @@ class Args:
     action_space = 36
     state_space = 625
 
+    critic_lr_multiply_coef = 2
+
 
 args = Args()
 
@@ -47,20 +49,24 @@ class PPO:
     use_cnn = False
 
     def __init__(
-        self,
-        device: str = "cpu",
-        run_dir: str = None,
-        writer: SummaryWriter = None,
-        use_gae: bool = True,
+            self,
+            device: str = "cpu",
+            run_dir: str = None,
+            writer: SummaryWriter = None,
+            use_gae: bool = True,
+            actor_hidden_layers: int = 1,
+            critic_hidden_layers: int = 1
     ):
         super(PPO, self).__init__()
         self.args = args
+
         if self.use_cnn:
             self.actor_net = CNN_Actor(self.state_space, self.action_space)
             self.critic_net = CNN_Critic(self.state_space)
         else:
-            self.actor_net = Actor(self.state_space, self.action_space)
-            self.critic_net = Critic(self.state_space)
+            self.actor_net = Actor(self.state_space, self.action_space, hidden_layers=actor_hidden_layers)
+            self.critic_net = Critic(self.state_space, hidden_layers=critic_hidden_layers)
+
         self.actor_net = self.actor_net.to(device)
         self.critic_net = self.critic_net.to(device)
 
@@ -69,7 +75,9 @@ class PPO:
         self.training_step = 0
 
         self.actor_optimizer = optim.Adam(self.actor_net.parameters(), lr=self.lr)
-        self.critic_net_optimizer = optim.Adam(self.critic_net.parameters(), lr=self.lr)
+        self.critic_net_optimizer = optim.Adam(self.critic_net.parameters(),
+                                               lr=args.critic_lr_multiply_coef * self.lr)
+        # NOTE: critic lr is multiplied by something
 
         self.device = device
 
@@ -109,15 +117,15 @@ class PPO:
         )
         action = (
             torch.tensor([t.action for t in self.buffer], dtype=torch.long)
-            .view(-1, 1)
-            .to(self.device)
+                .view(-1, 1)
+                .to(self.device)
         )
         reward = [t.reward for t in self.buffer]
 
         old_action_log_prob = (
             torch.tensor([t.a_log_prob for t in self.buffer], dtype=torch.float)
-            .view(-1, 1)
-            .to(self.device)
+                .view(-1, 1)
+                .to(self.device)
         )
 
         if self.use_gae:
@@ -140,7 +148,7 @@ class PPO:
             Gt = torch.tensor(Gt, dtype=torch.float).to(self.device)
         for i in range(self.ppo_update_time):
             for index in BatchSampler(
-                SubsetRandomSampler(range(len(self.buffer))), self.batch_size, False
+                    SubsetRandomSampler(range(len(self.buffer))), self.batch_size, False
             ):
                 Gt_index = Gt[index].view(-1, 1)
                 V = self.critic_net(state[index].squeeze(1))
@@ -157,8 +165,8 @@ class PPO:
                 ratio = action_prob / old_action_log_prob[index]
                 surr1 = ratio * advantage
                 surr2 = (
-                    torch.clamp(ratio, 1 - self.clip_param, 1 + self.clip_param)
-                    * advantage
+                        torch.clamp(ratio, 1 - self.clip_param, 1 + self.clip_param)
+                        * advantage
                 )
 
                 # update actor network
