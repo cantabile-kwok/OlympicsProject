@@ -1,3 +1,5 @@
 .idea/*
 .DS_Store
 /rl_trainer/models/
+.idea/misc.xml
+.idea/OlympicsProject.iml
