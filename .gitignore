@@ -3,3 +3,5 @@
 /rl_trainer/models/
 .idea/misc.xml
 .idea/OlympicsProject.iml
+*.xml
+*.iml
