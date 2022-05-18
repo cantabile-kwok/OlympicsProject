@@ -20,6 +20,7 @@ from env.chooseenv import make
 
 from rl_trainer.algo.ppo import PPO
 from rl_trainer.algo.random import random_agent
+from rl_trainer.algo.rule import frozen_agent
 from rl_trainer.log_path import *
 
 actions_map = {
@@ -89,7 +90,7 @@ def get_args():
         choices=algo_name_list,
     )
 
-    parser.add_argument("--max_episodes", default=1500, type=int)
+    parser.add_argument("--max_episodes", default=500, type=int)
     parser.add_argument("--episode_length", default=500, type=int)
     parser.add_argument(
         "--map", default=1, type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -106,6 +107,16 @@ def get_args():
     parser.add_argument("--load_episode", default=900, type=int)
 
     return parser.parse_args()
+def load_model(algo,device,run_dir,load_episode):
+    model = algo(device)
+    load_dir = os.path.join(run_dir)
+    model.load(load_dir, load_episode)
+def choose_agent(episode):
+    # to do : self play
+    if episode>100:
+        return random_agent()
+    else:
+        return frozen_agent()
 
 
 def main(args):
@@ -175,6 +186,8 @@ def main(args):
     with tqdm(range(args.max_episodes)) as pbar:
         while episode < args.max_episodes:
             state = env.reset(args.shuffle_map)
+
+            opponent_agent = choose_agent(episode)
             if args.render:
                 env.env_core.render()
             obs_ctrl_agent = np.array(state[ctrl_agent_index]["obs"]).flatten()
