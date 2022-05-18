@@ -6,7 +6,7 @@ import numpy as np
 
 
 class Running(OlympicsBase):
-    def __init__(self, map, seed=None, use_map_dist=False):
+    def __init__(self, map, seed=None, use_map_dist=False, use_hit_wall=False):
         super(Running, self).__init__(map, seed)
 
         self.gamma = 1  # v衰减系数
@@ -21,6 +21,7 @@ class Running(OlympicsBase):
         self.show_traj = True
 
         self.use_map_dist = use_map_dist
+        self.use_hit_wall = use_hit_wall
 
         # self.is_render = True
 
@@ -38,6 +39,7 @@ class Running(OlympicsBase):
                 agent_reward[agent_idx] = 100.0
         # ========================================================
 
+        # ==================== Distance related ==================
         if self.use_map_dist:
             if hasattr(self, "map_dist"):
                 map_dist = self.map_dist
@@ -65,6 +67,18 @@ class Running(OlympicsBase):
                 reward_this_pos = -dist_this_pos
                 agent_reward[agent_i] += reward_this_pos
             self.map_dist = map_dist
+        # ========================================================
+
+        # ================ Hit wall? ===============
+        hit_penalty = 25
+        if self.use_hit_wall:
+            if self.hit_wall[0]:
+                agent_reward[0] -= hit_penalty
+            if self.hit_wall[1]:
+                agent_reward[1] -= hit_penalty
+            self.hit_wall = [False, False]
+
+        # ==========================================
 
         return agent_reward
 

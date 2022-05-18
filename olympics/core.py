@@ -150,6 +150,7 @@ class OlympicsBase(object):
         self.draw_obs = True
         self.print_log = False
         self.print_log2 = False
+        self.hit_wall = [False, False]
         self.map_object = []
         self.global_wall_ignore = []
         self.global_circle_ignore = []
@@ -900,6 +901,7 @@ class OlympicsBase(object):
                 )
 
             if collision_wall_target is not None and collision_circle_target is None:
+                self.hit_wall[current_agent_idx] = True
                 if self.print_log:
                     print("HIT THE WALL!")
 
@@ -943,6 +945,7 @@ class OlympicsBase(object):
                 collision_wall_target is not None
                 and collision_circle_target == "circle"
             ):
+                self.hit_wall[current_agent_idx] = True
                 if self.print_log:
                     print("HIT BOTH!")
 

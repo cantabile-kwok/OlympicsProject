@@ -93,6 +93,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
                     else:
                         print('both have not reached 100 reward')
                         # raise NotImplementedError
+                        # FIXME
                 else:
                     num_win[2] += 1
 
