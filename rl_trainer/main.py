@@ -113,7 +113,7 @@ def load_model(algo,run_dir,load_episode,device="cpu"):
     load_dir = os.path.join(run_dir)
     model.load(load_dir, load_episode)
     return model
-def choose_agent(episode,dir,onlinemodel,pool,p=1,device='cpu'):
+def choose_agent(episode,dir,onlinemodel,pool,p=0.5,device='cpu'):
     # to do : self play
     # online model 当前训练的模型
     # pool 历史模型池
@@ -121,13 +121,13 @@ def choose_agent(episode,dir,onlinemodel,pool,p=1,device='cpu'):
     # if episode<100:
     #     return frozen_agent()
     if episode<500:
-         return random_agent()
+         return random_agent(),-1
     if episode<2000:
         if random.uniform(0,1)<p:
             #return load_model(PPO,dir,episode//100*100,device)
             return pool.sample()
         else:
-            return onlinemodel
+            return onlinemodel,-1
 
 
 
