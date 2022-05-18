@@ -9,6 +9,6 @@ map: 1
 max_episodes: 1500
 render: false
 run_dir: tmp
-save_interval: 10
+save_interval: 100
 seed: 1
 shuffle_map: false
