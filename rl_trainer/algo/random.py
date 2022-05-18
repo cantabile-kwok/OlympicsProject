@@ -15,3 +15,8 @@ class random_agent:
         angle = random.uniform(self.angle_range[0], self.angle_range[1])
 
         return [[force], [angle]]
+    def select_action(self, obs, _=False):
+        force = random.uniform(self.force_range[0], self.force_range[1])
+        angle = random.uniform(self.angle_range[0], self.angle_range[1])
+
+        return [[force], [angle]]
