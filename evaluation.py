@@ -91,7 +91,8 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
                     elif reward[1] == 100:
                         num_win[1] += 1
                     else:
-                        raise NotImplementedError
+                        print('both have not reached 100 reward')
+                        # raise NotImplementedError
                 else:
                     num_win[2] += 1
 

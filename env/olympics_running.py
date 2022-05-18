@@ -31,13 +31,15 @@ class OlympicsRunning(Game):
         self.seed = seed
         self.set_seed()
 
+        self.use_map_dist = conf['use_map_dist']
+
         # choose a map randomly
         self.num_map = conf["map_num"]
         map_index_seq = list(range(1, conf["map_num"] + 1))
         rand_map_idx = random.choice(map_index_seq)
         Gamemap = create_scenario("map" + str(rand_map_idx))
 
-        self.env_core = Running(Gamemap)
+        self.env_core = Running(Gamemap, use_map_dist=self.use_map_dist)
         self.max_step = int(conf["max_step"])
         self.joint_action_space = self.set_action_space()
         self.action_dim = self.joint_action_space
@@ -77,7 +79,7 @@ class OlympicsRunning(Game):
             "the num is larger than the total number of map"
         )
         Gamemap = create_scenario("map" + str(num))
-        self.env_core = Running(Gamemap)
+        self.env_core = Running(Gamemap, use_map_dist=self.use_map_dist)
         _ = self.reset()
         self.env_core.map_num = num
 
@@ -87,7 +89,7 @@ class OlympicsRunning(Game):
             map_index_seq = list(range(1, self.num_map + 1))
             rand_map_idx = random.choice(map_index_seq)
             Gamemap = create_scenario("map" + str(rand_map_idx))
-            self.env_core = Running(Gamemap)
+            self.env_core = Running(Gamemap,  use_map_dist=self.use_map_dist)
             self.env_core.map_num = rand_map_idx
 
         self.env_core.reset()

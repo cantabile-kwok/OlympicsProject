@@ -1,9 +1,12 @@
+import itertools
+
 from olympics.core import OlympicsBase
 import time
+import numpy as np
 
 
 class Running(OlympicsBase):
-    def __init__(self, map, seed=None):
+    def __init__(self, map, seed=None, use_map_dist=False):
         super(Running, self).__init__(map, seed)
 
         self.gamma = 1  # v衰减系数
@@ -17,6 +20,8 @@ class Running(OlympicsBase):
         self.draw_obs = True
         self.show_traj = True
 
+        self.use_map_dist = use_map_dist
+
         # self.is_render = True
 
     def check_overlap(self):
@@ -25,11 +30,41 @@ class Running(OlympicsBase):
 
     def get_reward(self):
 
+        # ================= overall win/lose reward ==============
         agent_reward = [0.0 for _ in range(self.agent_num)]
 
         for agent_idx in range(self.agent_num):
             if self.agent_list[agent_idx].finished:
                 agent_reward[agent_idx] = 100.0
+        # ========================================================
+
+        if self.use_map_dist:
+            if hasattr(self, "map_dist"):
+                map_dist = self.map_dist
+            else:
+                # npy_path = f"../olympics/map_dist/map{self.map_num}.npy"
+                npy_path = f"olympics/map_dist/map{self.map_num}.npy"
+
+                map_dist = np.load(npy_path)
+                print(f"Loaded from {npy_path}")
+            for agent_i in range(self.agent_num):
+                agent_pos = self.agent_pos[agent_i]
+                dist_this_pos = map_dist[int(agent_pos[1]), int(agent_pos[0])]
+
+                if dist_this_pos == 0:
+                    all_coordinates = list(itertools.product(range(map_dist.shape[0]), range(map_dist.shape[1])))
+                    dist_to_this_pos = [(agent_pos[1] - x) ** 2 + (agent_pos[0] - y) ** 2 for (x, y) in all_coordinates]
+                    coordinate_idx_sorted_on_dist = np.argsort(dist_to_this_pos)  # from small to large
+                    for coordinate_idx in coordinate_idx_sorted_on_dist:
+                        coord = all_coordinates[coordinate_idx]
+                        if map_dist[coord] != 0:
+                            dist_this_pos = map_dist[coord]
+                            break
+                    map_dist[int(agent_pos[1]), int(agent_pos[0])] = dist_this_pos
+
+                reward_this_pos = -dist_this_pos
+                agent_reward[agent_i] += reward_this_pos
+            self.map_dist = map_dist
 
         return agent_reward
 

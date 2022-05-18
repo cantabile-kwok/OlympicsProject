@@ -1,0 +1,68 @@
+{'game_name': 'olympics-running', 'algo': 'ppo', 'max_episodes': 1500, 'episode_length': 500, 'map': 7, 'shuffle_map': False, 'seed': 1, 'device': 'cpu', 'save_interval': 10, 'render': False, 'load_model': False, 'load_run': 2, 'load_episode': 900, 'run_dir': 'map7_use_dist'}
+Total agent number: 2
+Agent control by the actor: 1
+Game board width: 700
+Game board height: 700
+action dimension: [[Box(-100.0, 200.0, (1,), float32), Box(-30.0, 30.0, (1,), float32)], [Box(-100.0, 200.0, (1,), float32), Box(-30.0, 30.0, (1,), float32)]]
+observation dimension: 625
+store in /mnt/lustre/sjtu/home/ywg12/remote/code/OlympicsProject/rl_trainer/models/olympics-running/ppo/map7_use_dist
+Episode:  1 controlled agent:  1 ; Episode Return:  -776.137084989848 ; win rate(controlled & opponent):  1.00 0.00 ; Trained episode: 0
+Episode:  2 controlled agent:  1 ; Episode Return:  -704.970562748477 ; win rate(controlled & opponent):  1.00 0.00 ; Trained episode: 1
+Episode:  3 controlled agent:  1 ; Episode Return:  -710.124891681028 ; win rate(controlled & opponent):  1.00 0.00 ; Trained episode: 2
+Episode:  4 controlled agent:  1 ; Episode Return:  -822.722871427475 ; win rate(controlled & opponent):  1.00 0.00 ; Trained episode: 3
+Episode:  5 controlled agent:  1 ; Episode Return:  -665.3847763108502 ; win rate(controlled & opponent):  1.00 0.00 ; Trained episode: 4
+Episode:  6 controlled agent:  1 ; Episode Return:  -510.5340546095184 ; win rate(controlled & opponent):  0.83 0.17 ; Trained episode: 5
+Episode:  7 controlled agent:  1 ; Episode Return:  -752.2670273047589 ; win rate(controlled & opponent):  0.71 0.29 ; Trained episode: 5
+Episode:  8 controlled agent:  1 ; Episode Return:  -809.4213562373102 ; win rate(controlled & opponent):  0.75 0.25 ; Trained episode: 5
+Episode:  9 controlled agent:  1 ; Episode Return:  -891.3919189857875 ; win rate(controlled & opponent):  0.67 0.33 ; Trained episode: 6
+Episode:  10 controlled agent:  1 ; Episode Return:  -171.31370849898477 ; win rate(controlled & opponent):  0.70 0.30 ; Trained episode: 6
+Episode:  11 controlled agent:  1 ; Episode Return:  -904.9898987322345 ; win rate(controlled & opponent):  0.64 0.36 ; Trained episode: 7
+Episode:  12 controlled agent:  1 ; Episode Return:  -751.6518036156094 ; win rate(controlled & opponent):  0.67 0.33 ; Trained episode: 7
+Episode:  13 controlled agent:  1 ; Episode Return:  -722.254833995939 ; win rate(controlled & opponent):  0.62 0.38 ; Trained episode: 8
+Episode:  14 controlled agent:  1 ; Episode Return:  -410.7989898732233 ; win rate(controlled & opponent):  0.64 0.36 ; Trained episode: 8
+Episode:  15 controlled agent:  1 ; Episode Return:  -908.3746750430848 ; win rate(controlled & opponent):  0.60 0.40 ; Trained episode: 9
+Episode:  16 controlled agent:  1 ; Episode Return:  -744.6223663640867 ; win rate(controlled & opponent):  0.62 0.38 ; Trained episode: 9
+Episode:  17 controlled agent:  1 ; Episode Return:  -406.14213562373095 ; win rate(controlled & opponent):  0.65 0.35 ; Trained episode: 10
+Episode:  18 controlled agent:  1 ; Episode Return:  -734.6690475583121 ; win rate(controlled & opponent):  0.67 0.33 ; Trained episode: 11
+Episode:  19 controlled agent:  1 ; Episode Return:  -777.3797256769674 ; win rate(controlled & opponent):  0.68 0.32 ; Trained episode: 12
+Episode:  20 controlled agent:  1 ; Episode Return:  -395.22539674441623 ; win rate(controlled & opponent):  0.65 0.35 ; Trained episode: 13
+Episode:  21 controlled agent:  1 ; Episode Return:  -871.4507934888329 ; win rate(controlled & opponent):  0.62 0.38 ; Trained episode: 13
+Episode:  22 controlled agent:  1 ; Episode Return:  -762.9777054234144 ; win rate(controlled & opponent):  0.64 0.36 ; Trained episode: 13
+Episode:  23 controlled agent:  1 ; Episode Return:  -710.142135623731 ; win rate(controlled & opponent):  0.65 0.35 ; Trained episode: 14
+Episode:  24 controlled agent:  1 ; Episode Return:  -808.6934341759522 ; win rate(controlled & opponent):  0.62 0.38 ; Trained episode: 15
+Episode:  25 controlled agent:  1 ; Episode Return:  -817.267027304759 ; win rate(controlled & opponent):  0.64 0.36 ; Trained episode: 15
+Episode:  26 controlled agent:  1 ; Episode Return:  -86.97056274847715 ; win rate(controlled & opponent):  0.65 0.35 ; Trained episode: 16
+Episode:  27 controlled agent:  1 ; Episode Return:  -349.4852813742386 ; win rate(controlled & opponent):  0.67 0.33 ; Trained episode: 17
+Episode:  28 controlled agent:  1 ; Episode Return:  -726.556349186104 ; win rate(controlled & opponent):  0.68 0.32 ; Trained episode: 18
+Episode:  29 controlled agent:  1 ; Episode Return:  -831.4386001800128 ; win rate(controlled & opponent):  0.69 0.31 ; Trained episode: 19
+Episode:  30 controlled agent:  1 ; Episode Return:  -538.9411254969543 ; win rate(controlled & opponent):  0.70 0.30 ; Trained episode: 20
+Episode:  31 controlled agent:  1 ; Episode Return:  -829.3208511739219 ; win rate(controlled & opponent):  0.68 0.32 ; Trained episode: 21
+Episode:  32 controlled agent:  1 ; Episode Return:  -806.9066376115488 ; win rate(controlled & opponent):  0.66 0.34 ; Trained episode: 21
+Episode:  33 controlled agent:  1 ; Episode Return:  -796.0243866176397 ; win rate(controlled & opponent):  0.67 0.33 ; Trained episode: 21
+Episode:  34 controlled agent:  1 ; Episode Return:  -775.5512985522212 ; win rate(controlled & opponent):  0.65 0.35 ; Trained episode: 22
+Episode:  35 controlled agent:  1 ; Episode Return:  -671.6690475583121 ; win rate(controlled & opponent):  0.66 0.34 ; Trained episode: 22
+Episode:  36 controlled agent:  1 ; Episode Return:  -796.4091629284901 ; win rate(controlled & opponent):  0.64 0.36 ; Trained episode: 23
+Episode:  37 controlled agent:  1 ; Episode Return:  -776.7766952966379 ; win rate(controlled & opponent):  0.65 0.35 ; Trained episode: 23
+Episode:  38 controlled agent:  1 ; Episode Return:  -875.4507934888329 ; win rate(controlled & opponent):  0.63 0.37 ; Trained episode: 24
+Episode:  39 controlled agent:  1 ; Episode Return:  -618.7401153701776 ; win rate(controlled & opponent):  0.62 0.38 ; Trained episode: 24
+Episode:  40 controlled agent:  1 ; Episode Return:  -294.55634918610406 ; win rate(controlled & opponent):  0.62 0.38 ; Trained episode: 24
+Episode:  41 controlled agent:  1 ; Episode Return:  -758.2375900532362 ; win rate(controlled & opponent):  0.63 0.37 ; Trained episode: 25
+Episode:  42 controlled agent:  1 ; Episode Return:  -822.1198410471454 ; win rate(controlled & opponent):  0.62 0.38 ; Trained episode: 26
+Episode:  43 controlled agent:  1 ; Episode Return:  -801.7645019878178 ; win rate(controlled & opponent):  0.63 0.37 ; Trained episode: 26
+Episode:  44 controlled agent:  1 ; Episode Return:  -736.1959594928935 ; win rate(controlled & opponent):  0.64 0.36 ; Trained episode: 27
+Episode:  45 controlled agent:  1 ; Episode Return:  -844.8822509939087 ; win rate(controlled & opponent):  0.64 0.36 ; Trained episode: 28
+Episode:  46 controlled agent:  1 ; Episode Return:  -466.61017305526656 ; win rate(controlled & opponent):  0.63 0.37 ; Trained episode: 29
+Episode:  47 controlled agent:  1 ; Episode Return:  -776.7645019878177 ; win rate(controlled & opponent):  0.62 0.38 ; Trained episode: 29
+Episode:  48 controlled agent:  1 ; Episode Return:  -815.9827560572969 ; win rate(controlled & opponent):  0.60 0.40 ; Trained episode: 29
+Episode:  49 controlled agent:  1 ; Episode Return:  -670.7766952966379 ; win rate(controlled & opponent):  0.59 0.41 ; Trained episode: 29
+Episode:  50 controlled agent:  1 ; Episode Return:  -804.0782104868026 ; win rate(controlled & opponent):  0.60 0.40 ; Trained episode: 29
+Episode:  51 controlled agent:  1 ; Episode Return:  -888.333044482742 ; win rate(controlled & opponent):  0.59 0.41 ; Trained episode: 30
+Episode:  52 controlled agent:  1 ; Episode Return:  -793.0243866176397 ; win rate(controlled & opponent):  0.60 0.40 ; Trained episode: 30
+Episode:  53 controlled agent:  1 ; Episode Return:  -779.7766952966379 ; win rate(controlled & opponent):  0.58 0.42 ; Trained episode: 31
+Episode:  54 controlled agent:  1 ; Episode Return:  -718.4974746830583 ; win rate(controlled & opponent):  0.59 0.41 ; Trained episode: 31
+Episode:  55 controlled agent:  1 ; Episode Return:  -821.592929112564 ; win rate(controlled & opponent):  0.58 0.42 ; Trained episode: 32
+Episode:  56 controlled agent:  1 ; Episode Return:  -839.2914139223992 ; win rate(controlled & opponent):  0.57 0.43 ; Trained episode: 32
+Episode:  57 controlled agent:  1 ; Episode Return:  -770.267027304759 ; win rate(controlled & opponent):  0.58 0.42 ; Trained episode: 32
+Episode:  58 controlled agent:  1 ; Episode Return:  -169.48528137423858 ; win rate(controlled & opponent):  0.59 0.41 ; Trained episode: 33
+Episode:  59 controlled agent:  1 ; Episode Return:  -754.698484809835 ; win rate(controlled & opponent):  0.58 0.42 ; Trained episode: 34
+Episode:  60 controlled agent:  1 ; Episode Return:  -702.4852813742385 ; win rate(controlled & opponent):  0.58 0.42 ; Trained episode: 34

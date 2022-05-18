@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import os.path
 import random
 import sys
 from pathlib import Path
@@ -104,12 +105,21 @@ def get_args():
     parser.add_argument("--load_model", action="store_true")
     parser.add_argument("--load_run", default=2, type=int)
     parser.add_argument("--load_episode", default=900, type=int)
+    parser.add_argument("--run_dir", type=str, help='Running directory name (for experiments)')
 
     return parser.parse_args()
 
 
 def main(args):
-    pprint(args.__dict__)
+    run_dir, log_dir = make_logpath(args.game_name, args.algo)
+    run_dir = os.path.join(os.path.dirname(run_dir), args.run_dir)
+    if not os.path.exists(run_dir):
+        os.makedirs(run_dir)
+    log_dir = run_dir
+
+    log_file = open(f"{log_dir}/train.log", 'w')
+
+    print(args.__dict__, file=log_file)
 
     env = get_game(args.seed)
     if not args.shuffle_map:
@@ -118,26 +128,24 @@ def main(args):
         )  # specifying a map, you can also shuffle the map by not doing this step
 
     num_agents = env.n_player
-    print(f"Total agent number: {num_agents}")
+    print(f"Total agent number: {num_agents}", file=log_file)
 
     ctrl_agent_index = 1
-    print(f"Agent control by the actor: {ctrl_agent_index}")
+    print(f"Agent control by the actor: {ctrl_agent_index}", file=log_file)
 
     width = env.env_core.view_setting["width"] + 2 * env.env_core.view_setting["edge"]
     height = env.env_core.view_setting["height"] + 2 * env.env_core.view_setting["edge"]
-    print(f"Game board width: {width}")
-    print(f"Game board height: {height}")
+    print(f"Game board width: {width}", file=log_file)
+    print(f"Game board height: {height}", file=log_file)
 
     act_dim = env.action_dim
     obs_dim = 25 * 25
-    print(f"action dimension: {act_dim}")
-    print(f"observation dimension: {obs_dim}")
+    print(f"action dimension: {act_dim}", file=log_file)
+    print(f"observation dimension: {obs_dim}", file=log_file)
 
     setup_seed(args.seed)
 
-    run_dir, log_dir = make_logpath(args.game_name, args.algo)
-
-    print(f"store in {run_dir}")
+    print(f"store in {run_dir}", file=log_file)
     if not args.load_model:
         writer = SummaryWriter(
             os.path.join(
@@ -264,6 +272,7 @@ def main(args):
                         "%.2f" % (sum(record_win_op) / len(record_win_op)),
                         "; Trained episode:",
                         train_count,
+                        file=log_file
                     )
 
                     if not args.load_model:
@@ -279,6 +288,9 @@ def main(args):
                     break
             if episode % args.save_interval == 0 and not args.load_model:
                 model.save(run_dir, episode)
+                log_file.flush()
+
+    log_file.close()
 
 
 if __name__ == "__main__":
