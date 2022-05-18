@@ -77,6 +77,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
         step = 0
 
         while True:
+            # print(step, end='\t')
             joint_action = get_join_actions(state, agent_list)
             next_state, reward, done, _, info = env.step(joint_action)
             reward = np.array(reward)
@@ -136,7 +137,7 @@ if __name__ == "__main__":
         default="all",
     )
     parser.add_argument("--render", type=bool, default=True)
-    parser.add_argument("--seed", default=100)
+    parser.add_argument("--seed", default=123)
     args = parser.parse_args()
 
     env_type = "olympics-running"

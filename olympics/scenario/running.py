@@ -31,6 +31,8 @@ class Running(OlympicsBase):
 
     def get_reward(self):
 
+        # print(self.hit_wall[0])  # FIXME
+
         # ================= overall win/lose reward ==============
         agent_reward = [0.0 for _ in range(self.agent_num)]
 
