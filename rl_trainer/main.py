@@ -1,3 +1,4 @@
+import _io
 import argparse
 import datetime
 import os.path
@@ -67,8 +68,8 @@ algo_list = [PPO]
 algo_map = dict(zip(algo_name_list, algo_list))
 
 
-def get_game(seed: int = None, config: Dict = None):
-    return make("olympics-running", seed, config)
+def get_game(seed: int = None, config: Dict = None, log_file=None):
+    return make("olympics-running", seed, config, log_file=log_file)
 
 
 def setup_seed(seed: int):
@@ -124,7 +125,7 @@ def main(args):
 
     print(args.__dict__, file=log_file)
 
-    env = get_game(args.seed)
+    env = get_game(args.seed, log_file=log_file)
     if not args.shuffle_map:
         env.specify_a_map(
             args.map
