@@ -4,6 +4,7 @@ import datetime
 import os.path
 import random
 import sys
+from copy import deepcopy
 from pathlib import Path
 from pprint import pprint
 from typing import Dict
@@ -107,9 +108,10 @@ def get_args():
     parser.add_argument("--load_run", default=2, type=int)
     parser.add_argument("--load_episode", default=900, type=int)
     parser.add_argument("--run_dir", type=str, help='Running directory name (for experiments)')
-
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
+    parser.add_argument("--num_frame", default=3, type=int, help="number of frames(states) in one time step")
+    parser.add_argument("--use_cnn", default=True, type=bool, help="whether use cnn network")
 
     return parser.parse_args()
 
@@ -167,6 +169,11 @@ def main(args):
     record_win_op = deque(maxlen=100)
 
     algo = algo_map[args.algo]
+    algo.use_cnn = args.use_cnn
+    if algo.use_cnn:
+        algo.num_frame = args.num_frame
+    else:
+        algo.state_space = args.num_frame * 625
 
     if args.load_model:
         model = algo(args.device)
@@ -189,9 +196,12 @@ def main(args):
     with tqdm(range(args.max_episodes)) as pbar:
         while episode < args.max_episodes:
             state = env.reset(args.shuffle_map)
+            state_buffer = [np.zeros((25, 25)) for _ in range(args.num_frame - 1)]
             if args.render:
                 env.env_core.render()
-            obs_ctrl_agent = np.array(state[ctrl_agent_index]["obs"]).flatten()
+            obs_ctrl_agent = np.array(state[ctrl_agent_index]["obs"])
+            state_buffer.insert(0, obs_ctrl_agent)
+
             obs_oppo_agent = state[1 - ctrl_agent_index]["obs"]
 
             episode += 1
@@ -209,7 +219,7 @@ def main(args):
                 # ]  # here we assume the opponent is not moving in the demo
 
                 action_ctrl_raw, action_prob = model.select_action(
-                    obs_ctrl_agent, False if args.load_model else True
+                    np.array(state_buffer), False if args.load_model else True
                 )
                 # inference
                 action_ctrl = actions_map[action_ctrl_raw]
@@ -240,19 +250,23 @@ def main(args):
                     else:
                         post_reward = [-1.0, -1.0]
 
+                obs_oppo_agent = next_obs_oppo_agent
+                obs_ctrl_agent = np.array(next_obs_ctrl_agent)
+                last_state = deepcopy(state_buffer)
+                state_buffer.pop(-1)
+                state_buffer.insert(0, obs_ctrl_agent)
+
                 if not args.load_model:
                     trans = Transition(
-                        obs_ctrl_agent,
+                        np.array(last_state),
                         action_ctrl_raw,
                         action_prob,
                         post_reward[ctrl_agent_index],
-                        next_obs_ctrl_agent,
+                        np.array(state_buffer),
                         done,
                     )
                     model.store_transition(trans)
 
-                obs_oppo_agent = next_obs_oppo_agent
-                obs_ctrl_agent = np.array(next_obs_ctrl_agent).flatten()
                 if args.render:
                     env.env_core.render()
                 Gt += reward[ctrl_agent_index] if done else -1
@@ -283,11 +297,8 @@ def main(args):
 
                     if not args.load_model:
                         if args.algo == "ppo" and len(model.buffer) >= model.batch_size:
-                            if win_is == 1:
-                                model.update(episode)
-                                train_count += 1
-                            else:
-                                model.clear_buffer()
+                            model.update(episode)
+                            train_count += 1
 
                         writer.add_scalar("training Gt", Gt, episode)
 

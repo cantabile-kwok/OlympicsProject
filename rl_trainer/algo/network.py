@@ -81,25 +81,25 @@ class Critic(nn.Module):
 
 
 class CNN_Actor(nn.Module):
-    def __init__(self, state_space, action_space, hidden_size=64):
+    def __init__(self, in_channels, action_space, hidden_size=64):
         super(CNN_Actor, self).__init__()
 
         # self.conv1 = nn.Conv2d(in_channels = 8, out_channels=32, kernel_size = 4, stride = 2)
         # self.conv2 = nn.Conv2d(in_channels = 32, out_channels=64, kernel_size = 3, stride = 1)
         # self.flatten = nn.Flatten()
         self.net = Net = nn.Sequential(
-            nn.Conv2d(in_channels=8, out_channels=32, kernel_size=4, stride=2),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels=in_channels, out_channels=4 * in_channels, kernel_size=4, stride=2),
+            nn.BatchNorm2d(4 * in_channels),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels=4 * in_channels, out_channels=8 * in_channels, kernel_size=3, stride=1),
+            nn.BatchNorm2d(8 * in_channels),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=1),
             nn.Flatten(),
         )
 
-        self.linear1 = nn.Linear(256, 64)
+        self.linear1 = nn.Linear(32 * in_channels, 64)
         self.linear2 = nn.Linear(64, action_space)
 
     def forward(self, x):
@@ -110,22 +110,22 @@ class CNN_Actor(nn.Module):
 
 
 class CNN_Critic(nn.Module):
-    def __init__(self, state_space, hidden_size=64):
+    def __init__(self, in_channels, hidden_size=64):
         super(CNN_Critic, self).__init__()
 
         self.net = Net = nn.Sequential(
-            nn.Conv2d(in_channels=8, out_channels=32, kernel_size=4, stride=2),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels=in_channels, out_channels=4 * in_channels, kernel_size=4, stride=2),
+            nn.BatchNorm2d(4 * in_channels),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels=4 * in_channels, out_channels=8 * in_channels, kernel_size=3, stride=1),
+            nn.BatchNorm2d(8 * in_channels),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=1),
             nn.Flatten(),
         )
 
-        self.linear1 = nn.Linear(256, 64)
+        self.linear1 = nn.Linear(32 * in_channels, 64)
         self.linear2 = nn.Linear(64, 1)
 
     def forward(self, x):

@@ -1,2 +1,15 @@
 .idea/*
 .DS_Store
+.DS_Store
+rl_trainer/.DS_Store
+rl_trainer/models/.DS_Store
+rl_trainer/models/olympics-running/.DS_Store
+rl_trainer/models/olympics-running/ppo/.DS_Store
+.idea/misc.xml
+.idea/OlympicsProject.iml
+*.xml
+*.iml
+rl_trainer/.DS_Store
+rl_trainer/models/.DS_Store
+rl_trainer/models/olympics-running/.DS_Store
+rl_trainer/models/olympics-running/ppo/.DS_Store

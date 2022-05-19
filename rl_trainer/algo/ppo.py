@@ -47,6 +47,7 @@ class PPO:
     lr = args.lr
     gae_lambda = args.gae_lambda
     use_cnn = False
+    num_frame = None
 
     def __init__(
             self,
@@ -61,8 +62,8 @@ class PPO:
         self.args = args
 
         if self.use_cnn:
-            self.actor_net = CNN_Actor(self.state_space, self.action_space)
-            self.critic_net = CNN_Critic(self.state_space)
+            self.actor_net = CNN_Actor(self.num_frame, self.action_space)
+            self.critic_net = CNN_Critic(self.num_frame)
         else:
             self.actor_net = Actor(self.state_space, self.action_space, hidden_layers=actor_hidden_layers)
             self.critic_net = Critic(self.state_space, hidden_layers=critic_hidden_layers)
@@ -88,7 +89,10 @@ class PPO:
         self.use_gae = use_gae
 
     def select_action(self, state, train=True):
-        state = torch.from_numpy(state).float().unsqueeze(0).to(self.device)
+        if not self.use_cnn:
+            state = torch.from_numpy(state).float().view(1, -1).to(self.device)
+        else:
+            state = torch.from_numpy(state).float().unsqueeze(0).to(self.device)
         with torch.no_grad():
             action_prob = self.actor_net(state)
         c = Categorical(action_prob)
@@ -112,9 +116,14 @@ class PPO:
         self.counter += 1
 
     def update(self, ep_i):
-        state = torch.tensor([t.state for t in self.buffer], dtype=torch.float).to(
-            self.device
-        )
+        if not self.use_cnn:
+            state = torch.tensor([t.state.flatten() for t in self.buffer], dtype=torch.float).to(
+                self.device
+            )
+        else:
+            state = torch.tensor([t.state for t in self.buffer], dtype=torch.float).to(
+                self.device
+            )
         action = (
             torch.tensor([t.action for t in self.buffer], dtype=torch.long)
                 .view(-1, 1)
@@ -151,14 +160,14 @@ class PPO:
                     SubsetRandomSampler(range(len(self.buffer))), self.batch_size, False
             ):
                 Gt_index = Gt[index].view(-1, 1)
-                V = self.critic_net(state[index].squeeze(1))
+                V = self.critic_net(state[index])
                 delta = Gt_index - V
                 if self.use_gae:
                     advantage = Advt[index]
                 else:
                     advantage = delta.detach()
                 # epoch iteration, PPO core!!!
-                action_prob = self.actor_net(state[index].squeeze(1)).gather(
+                action_prob = self.actor_net(state[index]).gather(
                     1, action[index]
                 )  # new policy
 
