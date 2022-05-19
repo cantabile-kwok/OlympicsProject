@@ -7,7 +7,6 @@ from tabulate import tabulate
 import argparse
 from rl_trainer.algo import *
 
-
 actions_map = {
     0: [-100, -30],
     1: [-100, -18],
@@ -49,7 +48,6 @@ actions_map = {
 
 
 def get_join_actions(state, agent_list):
-
     joint_actions = []
 
     for agent_idx in range(len(agent_list)):
@@ -138,6 +136,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("--render", type=bool, default=True)
     parser.add_argument("--seed", default=123)
+
+    parser.add_argument('--actor_hidden_layers', type=int, default=2)
+    parser.add_argument('--critic_hidden_layers', type=int, default=2)
     args = parser.parse_args()
 
     env_type = "olympics-running"
@@ -154,14 +155,16 @@ if __name__ == "__main__":
     agent_list = []
 
     if args.my_ai != "random":
-        agent = algo_map[args.my_ai]()
+        agent = algo_map[args.my_ai](actor_hidden_layers=args.actor_hidden_layers,
+                                     critic_hidden_layers=args.critic_hidden_layers)
         agent.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
         agent_list.append(agent)
     else:
         agent_list.append(random_agent(args.seed))
 
     if args.opponent != "random":
-        agent = algo_map[args.opponent]()
+        agent = algo_map[args.opponent](actor_hidden_layers=args.actor_hidden_layers,
+                                        critic_hidden_layers=args.critic_hidden_layers)
         agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
         agent_list.append(agent)
     else:

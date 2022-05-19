@@ -16,9 +16,6 @@
     ],
     "map_num": 11,
     "use_map_dist": true,
-    "use_hit_wall": true,
-
-    "actor_hidden_layers": 2,
-    "critic_hidden_layers": 2
+    "use_hit_wall": true
   }
 }
