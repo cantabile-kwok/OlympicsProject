@@ -16,6 +16,10 @@ from torch.utils.tensorboard import SummaryWriter
 
 base_dir = str(Path(__file__).resolve().parent.parent)
 sys.path.append(base_dir)
+sys.path.append(os.path.abspath('./'))
+if "/mnt/lustre/sjtu/home/ywg12/remote/code/BottomUpAttention/bottom-up-attention.pytorch-master" in sys.path:
+    sys.path.pop(sys.path.index("/mnt/lustre/sjtu/home/ywg12/remote/code/BottomUpAttention/bottom-up-attention.pytorch-master"))
+
 
 from collections import deque, namedtuple
 
@@ -111,7 +115,7 @@ def get_args():
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
     parser.add_argument("--num_frame", default=3, type=int, help="number of frames(states) in one time step")
-    parser.add_argument("--use_cnn", default=True, type=bool, help="whether use cnn network")
+    parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
 
     return parser.parse_args()
 
@@ -170,6 +174,7 @@ def main(args):
 
     algo = algo_map[args.algo]
     algo.use_cnn = args.use_cnn
+    print(f"Use CNN: {args.use_cnn}", file=log_file)
     if algo.use_cnn:
         algo.num_frame = args.num_frame
     else:
