@@ -72,12 +72,14 @@ class Running(OlympicsBase):
         # ========================================================
 
         # ================ Hit wall? ===============
-        hit_penalty = 25
+        hit_penalty = 8
         if self.use_hit_wall:
             if self.hit_wall[0]:
-                agent_reward[0] -= hit_penalty
+                self.hit_cnt[0] += 1
+                agent_reward[0] -= self.hit_cnt[0] * hit_penalty
             if self.hit_wall[1]:
-                agent_reward[1] -= hit_penalty
+                self.hit_cnt[1] += 1
+                agent_reward[1] -= self.hit_cnt[1] * hit_penalty
             self.hit_wall = [False, False]
 
         # ==========================================

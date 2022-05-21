@@ -89,17 +89,20 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
                 env.env_core.render()
 
             if done:
-                if reward[0] != reward[1]:
-                    if reward[0] == 100:
-                        num_win[0] += 1
-                    elif reward[1] == 100:
-                        num_win[1] += 1
-                    else:
-                        print('both have not reached 100 reward')
-                        # raise NotImplementedError
-                        # FIXME
+                # if reward[0] != reward[1]:
+                    # if reward[0] == 100:
+                if env.env_core.agent_list[0].finished:
+                    num_win[0] += 1
+                elif env.env_core.agent_list[1].finished:
+                # elif reward[1] == 100:
+                    num_win[1] += 1
                 else:
+                    # print('both have not reached 100 reward')
+                    # raise NotImplementedError
+                    # FIXME
                     num_win[2] += 1
+
+                # else:
                 break
 
             for k in range(len(agent_list)):

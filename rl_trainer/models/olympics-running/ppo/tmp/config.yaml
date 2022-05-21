@@ -1,6 +1,6 @@
 actor_hidden_layers: 2
 algo: ppo
-critic_hidden_layers: 2
+critic_hidden_layers: 1
 device: cpu
 episode_length: 500
 game_name: olympics-running
@@ -9,8 +9,10 @@ load_model: false
 load_run: 2
 map: 1
 max_episodes: 1500
+num_frame: 3
 render: false
 run_dir: tmp
-save_interval: 5
+save_interval: 100
 seed: 1
 shuffle_map: false
+use_cnn: false

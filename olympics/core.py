@@ -160,6 +160,7 @@ class OlympicsBase(object):
         self.gamma = 0.98  # v衰减系数
         self.restitution = 0.8
 
+        self.hit_cnt = [0, 0]
         self.step_cnt = 0
         self.done = False
         self.max_step = 500
@@ -311,6 +312,7 @@ class OlympicsBase(object):
     def reset(self):
         self.set_seed()
         self.init_state()
+        self.hit_cnt = [0, 0]
         self.step_cnt = 0
         self.done = False
 
