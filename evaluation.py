@@ -51,7 +51,7 @@ def get_join_actions(state, agent_list):
     joint_actions = []
 
     for agent_idx in range(len(agent_list)):
-        obs = state[agent_idx]["obs"].flatten()
+        obs = np.array(state[agent_idx])
         actions_raw = agent_list[agent_idx].choose_action(obs)
         if np.isscalar(actions_raw):
             actions = actions_map[actions_raw]
@@ -69,6 +69,11 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
         episode_reward = np.zeros(2)
 
         state = env.reset(shuffle_map)
+        state_buffers = [[np.zeros((25, 25)) for _ in range(args.num_frame - 1)] for i in range(len(agent_list))]
+        for j in range(len(agent_list)):
+            obs_agent = np.array(state[j]["obs"])
+            state_buffers[j].insert(0, obs_agent)
+
         if render:
             env.env_core.render()
 
@@ -76,7 +81,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
 
         while True:
             # print(step, end='\t')
-            joint_action = get_join_actions(state, agent_list)
+            joint_action = get_join_actions(state_buffers, agent_list)
             next_state, reward, done, _, info = env.step(joint_action)
             reward = np.array(reward)
             episode_reward += reward
@@ -95,9 +100,14 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
                         # FIXME
                 else:
                     num_win[2] += 1
-
                 break
-            state = next_state
+
+            for k in range(len(agent_list)):
+                next_obs_agent = next_state[k]["obs"]
+                obs = np.array(next_obs_agent)
+                state_buffers[k].pop(-1)
+                state_buffers[k].insert(0, obs)
+
             step += 1
         total_reward += episode_reward
     total_reward /= episode
@@ -139,6 +149,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
+    parser.add_argument("--num_frame", default=3, type=int, help="number of frames(states) in one time step")
+    parser.add_argument("--use_cnn", default=False, type=bool, help="whether use cnn network")
     args = parser.parse_args()
 
     env_type = "olympics-running"
@@ -155,7 +167,13 @@ if __name__ == "__main__":
     agent_list = []
 
     if args.my_ai != "random":
-        agent = algo_map[args.my_ai](actor_hidden_layers=args.actor_hidden_layers,
+        algo = algo_map[args.my_ai]
+        algo.use_cnn = args.use_cnn
+        if algo.use_cnn:
+            algo.num_frame = args.num_frame
+        else:
+            algo.state_space = args.num_frame * 625
+        agent = algo(actor_hidden_layers=args.actor_hidden_layers,
                                      critic_hidden_layers=args.critic_hidden_layers)
         agent.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
         agent_list.append(agent)
