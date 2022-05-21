@@ -150,7 +150,7 @@ if __name__ == "__main__":
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
     parser.add_argument("--num_frame", default=3, type=int, help="number of frames(states) in one time step")
-    parser.add_argument("--use_cnn", default=False, type=bool, help="whether use cnn network")
+    parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
     args = parser.parse_args()
 
     env_type = "olympics-running"
