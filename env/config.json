@@ -16,6 +16,6 @@
     ],
     "map_num": 11,
     "use_map_dist": true,
-    "use_hit_wall": true
+    "use_hit_wall": false
   }
 }
