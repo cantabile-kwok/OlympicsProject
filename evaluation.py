@@ -154,6 +154,8 @@ if __name__ == "__main__":
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
     parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
+
+    parser.add_argument('--reverse', action='store_true', help='if true, then green is ours')
     args = parser.parse_args()
 
     env_type = "olympics-running"
@@ -192,6 +194,14 @@ if __name__ == "__main__":
         agent_list.append(random_agent(args.seed))
 
     # NOTE: [our ai, random]
+
+    # ================ revert order
+    if args.reverse:
+        print('Green is the controlled')
+        algo_list = list(reversed(algo_list))
+        agent_list = list(reversed(agent_list))
+    else:
+        print('Purple is the controlled')
 
     run_game(
         game,

@@ -4,6 +4,7 @@ rl_trainer/.DS_Store
 rl_trainer/models/.DS_Store
 rl_trainer/models/olympics-running/.DS_Store
 rl_trainer/models/olympics-running/ppo/.DS_Store
+rl_trainer/algo/__pycache__/*
 .idea/misc.xml
 .idea/OlympicsProject.iml
 *.xml
