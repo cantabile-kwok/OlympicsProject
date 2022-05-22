@@ -10,3 +10,4 @@ rl_trainer/algo/__pycache__/*
 *.xml
 *.iml
 ~$*.xlsx
+rl_trainer/algo/__pycache__/ppo.cpython-36.pyc
