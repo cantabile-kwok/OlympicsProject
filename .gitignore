@@ -9,3 +9,4 @@ olympics/__pycache__/*.pyc
 rl_trainer/__pycache__/*.pyc
 env/simulators/__pycache__/*.pyc
 env/__pycache__/*.pyc
+rl_trainer/.DS_Store
