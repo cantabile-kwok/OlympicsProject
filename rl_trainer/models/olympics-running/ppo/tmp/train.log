@@ -8,7 +8,4 @@ action dimension: [[Box(-100.0, 200.0, (1,), float32), Box(-30.0, 30.0, (1,), fl
 observation dimension: 625
 store in /Users/cantabile/Desktop/学期文件/大三下/博弈论与多智能体学习/OlympicsProject/rl_trainer/models/olympics-running/ppo/tmp
 Use CNN: False
-Episode:  1 controlled agent:  1 ; Episode Return:  -677.8700576850888 ; win rate(controlled & opponent):  0.00 1.00 ; Trained episode: 0
-Episode:  2 controlled agent:  1 ; Episode Return:  -132.82842712474618 ; win rate(controlled & opponent):  0.50 0.50 ; Trained episode: 1
-Episode:  3 controlled agent:  1 ; Episode Return:  -51.828427124746185 ; win rate(controlled & opponent):  0.67 0.33 ; Trained episode: 2
-Episode:  4 controlled agent:  1 ; Episode Return:  -707.8822509939084 ; win rate(controlled & opponent):  0.50 0.50 ; Trained episode: 3
+Episode:  1 controlled agent:  1 ; Episode Return:  -351.6274169979695 ; win rate(controlled & opponent):  1.00 0.00 ; Trained episode: 0

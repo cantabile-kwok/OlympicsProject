@@ -130,6 +130,7 @@ class PPO:
                 .to(self.device)
         )
         reward = [t.reward for t in self.buffer]
+        # reward = reward.mean
 
         old_action_log_prob = (
             torch.tensor([t.a_log_prob for t in self.buffer], dtype=torch.float)
