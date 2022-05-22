@@ -5,7 +5,7 @@
 .idea/OlympicsProject.iml
 *.xml
 *.iml
-.idea/misc.xml
-.idea/OlympicsProject.iml
-.idea/misc.xml
-.idea/OlympicsProject.iml
+olympics/__pycache__/*.pyc
+rl_trainer/__pycache__/*.pyc
+env/simulators/__pycache__/*.pyc
+env/__pycache__/*.pyc
