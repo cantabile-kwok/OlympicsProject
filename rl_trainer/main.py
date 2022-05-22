@@ -114,7 +114,7 @@ def get_args():
     parser.add_argument("--run_dir", type=str, help='Running directory name (for experiments)')
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
-    parser.add_argument("--num_frame", default=3, type=int, help="number of frames(states) in one time step")
+    parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
 
     return parser.parse_args()
