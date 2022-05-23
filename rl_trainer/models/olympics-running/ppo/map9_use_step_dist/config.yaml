@@ -9,7 +9,7 @@ load_model: false
 load_run: 2
 map: 9
 max_episodes: 1500
-num_frame: 3
+num_frame: 1
 render: false
 run_dir: map9_use_step_dist
 save_interval: 100
