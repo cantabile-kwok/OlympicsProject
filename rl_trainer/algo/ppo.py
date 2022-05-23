@@ -14,7 +14,7 @@ sys.path.append(str(os.path.dirname(father_path)))
 
 from rl_trainer.algo.network import Actor, CNN_Actor, CNN_Critic, Critic
 from torch.utils.tensorboard import SummaryWriter
-
+import numpy as np
 
 class Args:
     gae_lambda = 0.95
@@ -130,7 +130,10 @@ class PPO:
                 .to(self.device)
         )
         reward = [t.reward for t in self.buffer]
-        # reward = reward.mean
+
+        # =============== NOTE: standardize =============
+        reward = (np.array(reward) - np.mean(reward))/np.std(reward)
+        # ===============================================
 
         old_action_log_prob = (
             torch.tensor([t.a_log_prob for t in self.buffer], dtype=torch.float)
