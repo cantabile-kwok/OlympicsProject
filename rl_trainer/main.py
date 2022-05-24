@@ -116,6 +116,7 @@ def get_args():
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
     parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
+    parser.add_argument('--train_by_win', action='store_true')
 
     return parser.parse_args()
 
@@ -303,8 +304,15 @@ def main(args):
 
                     if not args.load_model:
                         if args.algo == "ppo" and len(model.buffer) >= model.batch_size:
-                            model.update(episode)
-                            train_count += 1
+                            if args.train_by_win:
+                                if win_is == 1:
+                                    model.update(episode)
+                                    train_count += 1
+                                else:
+                                    model.clear_buffer()
+                            else:
+                                model.update(episode)
+                                train_count += 1
 
                         writer.add_scalar("training Gt", Gt, episode)
 
