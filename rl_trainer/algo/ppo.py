@@ -132,7 +132,7 @@ class PPO:
         reward = [t.reward for t in self.buffer]
 
         # =============== NOTE: standardize =============
-        reward = (np.array(reward) - np.mean(reward))/np.std(reward)
+        # reward = (np.array(reward) - np.mean(reward))/np.std(reward)
         # ===============================================
 
         old_action_log_prob = (
