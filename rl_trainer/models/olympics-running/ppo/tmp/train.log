@@ -1,0 +1,11 @@
+{'game_name': 'olympics-running', 'algo': 'ppo', 'max_episodes': 1500, 'episode_length': 500, 'map': 1, 'shuffle_map': False, 'seed': 1, 'device': 'cpu', 'save_interval': 100, 'render': False, 'load_model': False, 'load_run': 2, 'load_episode': 900, 'run_dir': 'tmp', 'actor_hidden_layers': 2, 'critic_hidden_layers': 1, 'num_frame': 1, 'use_cnn': False}
+{'class_literal': 'OlympicsRunning', 'n_player': 2, 'max_step': 500, 'game_name': 'running', 'is_obs_continuous': True, 'is_act_continuous': True, 'agent_nums': [1, 1], 'obs_type': ['vector', 'vector'], 'map_num': 11, 'use_map_dist': True, 'use_hit_wall': False}
+Total agent number: 2
+Agent control by the actor: 1
+Game board width: 700
+Game board height: 700
+action dimension: [[Box(-100.0, 200.0, (1,), float32), Box(-30.0, 30.0, (1,), float32)], [Box(-100.0, 200.0, (1,), float32), Box(-30.0, 30.0, (1,), float32)]]
+observation dimension: 625
+store in /Users/cantabile/Desktop/学期文件/大三下/博弈论与多智能体学习/OlympicsProject/rl_trainer/models/olympics-running/ppo/tmp
+Use CNN: False
+Episode:  1 controlled agent:  1 ; Episode Return:  -43.21320343559643 ; win rate(controlled & opponent):  1.00 0.00 ; Trained episode: 0

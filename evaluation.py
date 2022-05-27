@@ -7,7 +7,6 @@ from tabulate import tabulate
 import argparse
 from rl_trainer.algo import *
 
-
 actions_map = {
     0: [-100, -30],
     1: [-100, -18],
@@ -49,11 +48,10 @@ actions_map = {
 
 
 def get_join_actions(state, agent_list):
-
     joint_actions = []
 
     for agent_idx in range(len(agent_list)):
-        obs = state[agent_idx]["obs"].flatten()
+        obs = np.array(state[agent_idx])
         actions_raw = agent_list[agent_idx].choose_action(obs)
         if np.isscalar(actions_raw):
             actions = actions_map[actions_raw]
@@ -71,13 +69,19 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
         episode_reward = np.zeros(2)
 
         state = env.reset(shuffle_map)
+        state_buffers = [[np.zeros((25, 25)) for _ in range(args.num_frame - 1)] for i in range(len(agent_list))]
+        for j in range(len(agent_list)):
+            obs_agent = np.array(state[j]["obs"])
+            state_buffers[j].insert(0, obs_agent)
+
         if render:
             env.env_core.render()
 
         step = 0
 
         while True:
-            joint_action = get_join_actions(state, agent_list)
+            # print(step, end='\t')
+            joint_action = get_join_actions(state_buffers, agent_list)
             next_state, reward, done, _, info = env.step(joint_action)
             reward = np.array(reward)
             episode_reward += reward
@@ -85,18 +89,28 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
                 env.env_core.render()
 
             if done:
-                if reward[0] != reward[1]:
-                    if reward[0] == 100:
-                        num_win[0] += 1
-                    elif reward[1] == 100:
-                        num_win[1] += 1
-                    else:
-                        raise NotImplementedError
+                # if reward[0] != reward[1]:
+                    # if reward[0] == 100:
+                if env.env_core.agent_list[0].finished:
+                    num_win[0] += 1
+                elif env.env_core.agent_list[1].finished:
+                # elif reward[1] == 100:
+                    num_win[1] += 1
                 else:
+                    # print('both have not reached 100 reward')
+                    # raise NotImplementedError
+                    # FIXME
                     num_win[2] += 1
 
+                # else:
                 break
-            state = next_state
+
+            for k in range(len(agent_list)):
+                next_obs_agent = next_state[k]["obs"]
+                obs = np.array(next_obs_agent)
+                state_buffers[k].pop(-1)
+                state_buffers[k].insert(0, obs)
+
             step += 1
         total_reward += episode_reward
     total_reward /= episode
@@ -133,12 +147,19 @@ if __name__ == "__main__":
         "--map",
         default="all",
     )
-    parser.add_argument("--render", type=bool, default=False)
-    parser.add_argument("--seed", default=0)
+    parser.add_argument("--render", type=bool, default=True)
+    parser.add_argument("--seed", default=123)
+
+    parser.add_argument('--actor_hidden_layers', type=int, default=2)
+    parser.add_argument('--critic_hidden_layers', type=int, default=2)
+    parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
+    parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
+
+    parser.add_argument('--reverse', action='store_true', help='if true, then green is ours')
     args = parser.parse_args()
 
     env_type = "olympics-running"
-    game = make(env_type, conf=None, seed=1)
+    game = make(env_type, conf=None, seed=args.seed)
 
     if args.map != "all":
         game.specify_a_map(int(args.map))
@@ -146,20 +167,41 @@ if __name__ == "__main__":
     else:
         shuffle = True
 
-    algo_list = [args.opponent, args.my_ai]  # your are controlling agent green
+    algo_list = [args.my_ai, args.opponent]  # your are controlling agent purple
+
     agent_list = []
-    if args.opponent != "random":
-        agent = algo_map[args.opponent]()
-        agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
-        agent_list.append(agent)
-    else:
-        agent_list.append(random_agent())
+
     if args.my_ai != "random":
-        agent = algo_map[args.my_ai]()
+        algo = algo_map[args.my_ai]
+        algo.use_cnn = args.use_cnn
+        if algo.use_cnn:
+            algo.num_frame = args.num_frame
+        else:
+            algo.state_space = args.num_frame * 625
+        agent = algo(actor_hidden_layers=args.actor_hidden_layers,
+                                     critic_hidden_layers=args.critic_hidden_layers)
         agent.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
         agent_list.append(agent)
     else:
-        agent_list.append(random_agent())
+        agent_list.append(random_agent(args.seed))
+
+    if args.opponent != "random":
+        agent = algo_map[args.opponent](actor_hidden_layers=args.actor_hidden_layers,
+                                        critic_hidden_layers=args.critic_hidden_layers)
+        agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
+        agent_list.append(agent)
+    else:
+        agent_list.append(random_agent(args.seed))
+
+    # NOTE: [our ai, random]
+
+    # ================ revert order
+    if args.reverse:
+        print('Green is the controlled')
+        algo_list = list(reversed(algo_list))
+        agent_list = list(reversed(agent_list))
+    else:
+        print('Purple is the controlled')
 
     run_game(
         game,

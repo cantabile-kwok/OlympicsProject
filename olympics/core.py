@@ -150,6 +150,7 @@ class OlympicsBase(object):
         self.draw_obs = True
         self.print_log = False
         self.print_log2 = False
+        self.hit_wall = [False, False]
         self.map_object = []
         self.global_wall_ignore = []
         self.global_circle_ignore = []
@@ -159,6 +160,7 @@ class OlympicsBase(object):
         self.gamma = 0.98  # v衰减系数
         self.restitution = 0.8
 
+        self.hit_cnt = [0, 0]
         self.step_cnt = 0
         self.done = False
         self.max_step = 500
@@ -310,6 +312,7 @@ class OlympicsBase(object):
     def reset(self):
         self.set_seed()
         self.init_state()
+        self.hit_cnt = [0, 0]
         self.step_cnt = 0
         self.done = False
 
@@ -900,6 +903,7 @@ class OlympicsBase(object):
                 )
 
             if collision_wall_target is not None and collision_circle_target is None:
+                self.hit_wall[current_agent_idx] = True
                 if self.print_log:
                     print("HIT THE WALL!")
 
@@ -943,6 +947,7 @@ class OlympicsBase(object):
                 collision_wall_target is not None
                 and collision_circle_target == "circle"
             ):
+                self.hit_wall[current_agent_idx] = True
                 if self.print_log:
                     print("HIT BOTH!")
 

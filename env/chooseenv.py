@@ -8,11 +8,15 @@ import env
 import os
 
 
-def make(env_type, seed=None, conf=None):
+def make(env_type, seed=None, conf=None, log_file=None):
     file_path = os.path.join(os.path.dirname(__file__), "config.json")
     if not conf:
         with open(file_path) as f:
             conf = json.load(f)[env_type]
+
+    if log_file is not None:
+        print(conf, file=log_file, flush=True)
+
     class_literal = conf["class_literal"]
     if env_type.split("-")[0] in ["olympics"]:
         return getattr(env, class_literal)(conf, seed)

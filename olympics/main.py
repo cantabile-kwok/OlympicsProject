@@ -40,6 +40,8 @@ if __name__ == "__main__":
 
     agent1 = random_agent()
     agent2 = random_agent()
+    # agent3 = random_agent()
+
 
     map_index_seq = list(range(1, 5))
     time_s = time.time()
@@ -68,6 +70,7 @@ if __name__ == "__main__":
 
             action1 = agent1.act(obs[0])
             action2 = agent2.act(obs[1])
+            # action2 = agent2.act(obs[1])
 
             obs, reward, done, _ = game.step([action1, action2])
 
