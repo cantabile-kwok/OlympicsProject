@@ -8,12 +8,11 @@ load_episode: 900
 load_model: false
 load_run: 2
 map: 1
-max_episodes: 3000
+max_episodes: 1500
 num_frame: 1
 render: false
 run_dir: tmp
 save_interval: 100
 seed: 1
 shuffle_map: false
-train_by_win: false
 use_cnn: false

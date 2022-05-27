@@ -309,8 +309,8 @@ def main(args):
 
                 # simple reward shaping
                 if not done:
-                    post_reward = [-1.0, -1.0]  # NOTE: non relevant to dist
-                    # post_reward = reward  # NOTE: adopt step-level dist reward
+                    # post_reward = [-1.0, -1.0]  # NOTE: non relevant to dist
+                    post_reward = reward  # NOTE: adopt step-level dist reward
                 else:
                     if reward[0] != reward[1]:
                         post_reward = (
