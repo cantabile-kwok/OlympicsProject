@@ -5,7 +5,11 @@ rl_trainer/models/.DS_Store
 rl_trainer/models/olympics-running/.DS_Store
 rl_trainer/models/olympics-running/ppo/.DS_Store
 rl_trainer/algo/__pycache__/*
+<<<<<<< HEAD
+rl_trainer/models/olympics-running/ppo/
+=======
 
+>>>>>>> d4624ae79094e4b924271462a7b2b705d0b96d83
 .idea/misc.xml
 .idea/OlympicsProject.iml
 *.xml
@@ -15,4 +19,8 @@ rl_trainer/algo/__pycache__/ppo.cpython-36.pyc
 olympics/__pycache__/*.pyc
 rl_trainer/__pycache__/*.pyc
 env/simulators/__pycache__/*.pyc
+<<<<<<< HEAD
 env/__pycache__/*.pyc
+=======
+env/__pycache__/*.pyc
+>>>>>>> d4624ae79094e4b924271462a7b2b705d0b96d83
