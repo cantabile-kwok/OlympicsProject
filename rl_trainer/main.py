@@ -206,8 +206,7 @@ def main(args):
             )
         )
         save_config(args, log_dir)
-    
-    shutil.copyfile(r'rl_trainer/main.py', os.path.join(run_dir, 'main.py'))
+    shutil.copyfile(r'F:\博弈论\OlympicsProject\rl_trainer\main.py', os.path.join(run_dir, 'main.py'))
     record_win = deque(maxlen=100)
     record_win_op = deque(maxlen=100)
 
