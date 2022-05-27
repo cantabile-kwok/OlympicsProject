@@ -236,9 +236,11 @@ def main(args):
     Agent_pool = agent_pool(args.device)
     episode = 0
     train_count = 0
-    op_dir = os.path.join(os.path.dirname(run_dir), "run" + str(9))  # use run9,just for test
-    Agent_pool.add(op_dir, 500)
-    op_dir = run_dir
+
+    # ================ NOTE: optionally add an existing model into agent pool =================
+    # op_dir = os.path.join(os.path.dirname(run_dir), "run" + str(9))  # use run9,just for test
+    # Agent_pool.add(op_dir, 500)
+    # =========================================================================================
 
     with tqdm(range(args.max_episodes)) as pbar:
         while episode < args.max_episodes:
