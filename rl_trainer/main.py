@@ -128,6 +128,7 @@ def get_args():
     parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
     parser.add_argument('--train_by_win', action='store_true')
+    parser.add_argument('--shuffle_place', action='store_true', help="whether shuffle start place")
 
     return parser.parse_args()
 
@@ -146,6 +147,8 @@ def choose_agent(episode, onlinemodel, pool, p=0.5, device='cpu'):
     # p 控制使用的模型是随机的还是
     # if episode<100:
     #     return frozen_agent()
+    if episode < 100:
+        return frozen_agent(), -1
     if episode < 500:
         return random_agent(), -1
     if episode < 2000:
@@ -248,6 +251,9 @@ def main(args):
             # <<<<<<< HEAD
             state_buffer = [np.zeros((25, 25)) for _ in range(args.num_frame - 1)]
             state_buffer_for_oppo = [np.zeros((25, 25)) for _ in range(args.num_frame - 1)]
+
+            if args.shuffle_place:
+                ctrl_agent_index = random.randint(0, 1)
 
             # =======
 
@@ -365,9 +371,13 @@ def main(args):
                         "%.2f" % (sum(record_win_op) / len(record_win_op)),
                         "; Trained episode:",
                         train_count,
+                        ";Result:",
+                        (win_is, win_is_op),
                         file=log_file
                     )
-                    win_r = sum(record_win) / len(record_win)
+                    # win_r = sum(record_win) / len(record_win)
+                    win_r = int(win_is > win_is_op)
+                    print(win_r, file=log_file)
                     # win_r = 0.6 #just for test
                     if win_r > 0.5 and index >= 0:
                         # update pool
