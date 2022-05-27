@@ -15,5 +15,6 @@ run_dir: tmp
 save_interval: 100
 seed: 1
 shuffle_map: false
+shuffle_place: false
 train_by_win: false
 use_cnn: false
