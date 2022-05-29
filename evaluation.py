@@ -161,8 +161,6 @@ if __name__ == "__main__":
 
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
-    parser.add_argument('--oppo_actor_hidden_layers', type=int, default=1)
-    parser.add_argument('--oppo_critic_hidden_layers', type=int, default=1)
     parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
 
@@ -197,8 +195,8 @@ if __name__ == "__main__":
         agent_list.append(random_agent(args.seed))
 
     if args.opponent != "random":
-        agent = algo_map[args.opponent](actor_hidden_layers=args.oppo_actor_hidden_layers,
-                                        critic_hidden_layers=args.oppo_critic_hidden_layers)
+        agent = algo_map[args.opponent](actor_hidden_layers=args.actor_hidden_layers,
+                                        critic_hidden_layers=args.critic_hidden_layers)
         agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
         agent_list.append(agent)
     else:
