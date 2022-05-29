@@ -9,6 +9,7 @@ from pathlib import Path
 from pprint import pprint
 from typing import Dict
 from tqdm import tqdm
+from rl_trainer.algo.pool import agent_pool
 
 import numpy as np
 import torch
@@ -118,11 +119,8 @@ def get_args():
     parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
     parser.add_argument('--train_by_win', action='store_true')
-# <<<<<<< HEAD
     parser.add_argument("--use_step_dist", action='store_true')
-# =======
     parser.add_argument('--shuffle_place', action='store_true', help="whether shuffle start place")
-# >>>>>>> main
 
     return parser.parse_args()
 
