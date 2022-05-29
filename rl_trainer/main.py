@@ -118,6 +118,7 @@ def get_args():
     parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
     parser.add_argument('--train_by_win', action='store_true')
+    parser.add_argument("--use_step_dist", action='store_true')
 
     return parser.parse_args()
 
@@ -246,8 +247,10 @@ def main(args):
 
                 # simple reward shaping
                 if not done:
-                    # post_reward = [-1.0, -1.0]  # NOTE: non relevant to dist
-                    post_reward = reward  # NOTE: adopt step-level dist reward
+                    if not args.use_step_dist:
+                        post_reward = [-1.0, -1.0]  # NOTE: non relevant to dist
+                    else:
+                        post_reward = reward  # NOTE: adopt step-level dist reward
                 else:
                     if reward[0] != reward[1]:
                         post_reward = (
@@ -300,7 +303,8 @@ def main(args):
                         "%.2f" % (sum(record_win_op) / len(record_win_op)),
                         "; Trained episode:",
                         train_count,
-                        file=log_file
+                        file=log_file,
+                        flush=True
                     )
 
                     if not args.load_model:

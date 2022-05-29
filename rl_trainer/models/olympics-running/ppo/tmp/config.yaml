@@ -1,5 +1,6 @@
-actor_hidden_layers: 2
+actor_hidden_layers: 1
 algo: ppo
+buffer_capacity: 3000
 critic_hidden_layers: 1
 device: cpu
 episode_length: 500
@@ -15,4 +16,6 @@ run_dir: tmp
 save_interval: 100
 seed: 1
 shuffle_map: false
-use_cnn: false
+train_by_win: false
+use_cnn: true
+use_step_dist: false
