@@ -15,14 +15,16 @@ sys.path.append(str(os.path.dirname(father_path)))
 from rl_trainer.algo.network import Actor, CNN_Actor, CNN_Critic, Critic
 from torch.utils.tensorboard import SummaryWriter
 import numpy as np
+import itertools
+from copy import deepcopy
 
 class Args:
     gae_lambda = 0.95
     clip_param = 0.2
     max_grad_norm = 0.5
     ppo_update_time = 5
-    buffer_capacity = 1000
-    batch_size = 32
+    buffer_capacity = 3000
+    batch_size = 2000
     gamma = 0.99
     lr = 0.0001
 
@@ -72,6 +74,7 @@ class PPO:
         self.critic_net = self.critic_net.to(device)
 
         self.buffer = []
+        self.tmp_buffer = []
         self.counter = 0
         self.training_step = 0
 
@@ -112,46 +115,58 @@ class PPO:
         return value.cpu().item()
 
     def store_transition(self, transition):
-        self.buffer.append(transition)
-        self.counter += 1
+        self.tmp_buffer.append(transition)
 
     def update(self, ep_i):
+        total_buffer = list(itertools.chain.from_iterable(self.buffer))
         if not self.use_cnn:
-            state = torch.tensor([t.state.flatten() for t in self.buffer], dtype=torch.float).to(
+            state = torch.tensor([t.state.flatten() for t in total_buffer], dtype=torch.float).to(
                 self.device
             )
+            episode_state = [torch.tensor([t.state.flatten() for t in self.buffer[i]], dtype=torch.float).to(self.device) for i in range(len(self.buffer))]
+
         else:
-            state = torch.tensor([t.state for t in self.buffer], dtype=torch.float).to(
+            state = torch.tensor([t.state for t in total_buffer], dtype=torch.float).to(
                 self.device
             )
+            episode_state = [torch.tensor([t.state for t in self.buffer[i]], dtype=torch.float).to(self.device) for i in range(len(self.buffer))]
+
+
         action = (
-            torch.tensor([t.action for t in self.buffer], dtype=torch.long)
+            torch.tensor([t.action for t in total_buffer], dtype=torch.long)
                 .view(-1, 1)
                 .to(self.device)
         )
-        reward = [t.reward for t in self.buffer]
+        reward = [[t.reward for t in self.buffer[i]] for i in range(len(self.buffer))]
 
         # =============== NOTE: standardize =============
         # reward = (np.array(reward) - np.mean(reward))/np.std(reward)
         # ===============================================
 
         old_action_log_prob = (
-            torch.tensor([t.a_log_prob for t in self.buffer], dtype=torch.float)
+            torch.tensor([t.a_log_prob for t in total_buffer], dtype=torch.float)
                 .view(-1, 1)
                 .to(self.device)
         )
 
         if self.use_gae:
-            value = self.critic_net(state).cpu().detach().reshape(-1)
-            R = reward[-1] - value[-1]
-            Gt = [R]
-            for step_i in range(len(reward) - 2, -1, -1):
-                delta = reward[step_i] + self.gamma * value[step_i + 1] - value[step_i]
-                R = delta + self.gamma * self.gae_lambda * R
-                Gt.insert(0, R)
-            Gt = torch.tensor(Gt, dtype=torch.float).to(self.device)
-            Advt = Gt.clone()
-            Gt += value.to(self.device)
+            Gt = []
+            Advt = []
+            for i in range(len(reward)):
+                value = self.critic_net(episode_state[i]).cpu().detach().reshape(-1)
+                R = reward[i][-1] - value[-1]
+                Gt_tmp = [R]
+                for step_i in range(len(reward[i]) - 2, -1, -1):
+                    delta = reward[i][step_i] + self.gamma * value[step_i + 1] - value[step_i]
+                    R = delta + self.gamma * self.gae_lambda * R
+                    Gt_tmp.insert(0, R)
+                Gt_tmp = torch.tensor(Gt_tmp, dtype=torch.float)
+                Advt_tmp = Gt_tmp.clone()
+                Gt_tmp += value
+                Gt.append(Gt_tmp)
+                Advt.append(Advt_tmp)
+            Gt = torch.cat(Gt).view(-1).to(self.device)
+            Advt = torch.cat(Advt).view(-1).to(self.device)
         else:
             R = 0
             Gt = []
@@ -207,8 +222,18 @@ class PPO:
 
         self.clear_buffer()
 
+    def clear_tmp_buffer(self):
+        del self.tmp_buffer[:]
+
     def clear_buffer(self):
         del self.buffer[:]
+        self.counter = 0
+
+    def merge_buffer(self):
+        self.buffer.append(deepcopy(self.tmp_buffer))
+        self.counter += len(self.tmp_buffer)
+        # for trans in self.tmp_buffer:
+        #     self.buffer.append(trans)
 
     def save(self, save_path, episode):
         base_path = os.path.join(save_path, "trained_model")

@@ -102,6 +102,7 @@ def get_args():
         "--map", default=1, type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     )
     parser.add_argument("--shuffle_map", action="store_true")
+    parser.add_argument("--buffer_capacity", default=3000, type=int)
 
     parser.add_argument("--seed", default=1, type=int)
     parser.add_argument("--device", default="cpu", type=str, choices=["cpu", "cuda"])
@@ -303,16 +304,22 @@ def main(args):
                     )
 
                     if not args.load_model:
-                        if args.algo == "ppo" and len(model.buffer) >= model.batch_size:
+                        if args.algo == "ppo":
                             if args.train_by_win:
                                 if win_is == 1:
+                                    model.merge_buffer()
+                                    if model.counter > args.buffer_capacity:
+                                        model.update(episode)
+                                        train_count += 1
+                                    model.clear_tmp_buffer()
+                                else:
+                                    model.clear_tmp_buffer()
+                            else:
+                                model.merge_buffer()
+                                if model.counter >= args.buffer_capacity:
                                     model.update(episode)
                                     train_count += 1
-                                else:
-                                    model.clear_buffer()
-                            else:
-                                model.update(episode)
-                                train_count += 1
+                                model.clear_tmp_buffer()
 
                         writer.add_scalar("training Gt", Gt, episode)
 
