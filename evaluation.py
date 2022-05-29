@@ -61,7 +61,7 @@ def get_join_actions(state, agent_list):
     return joint_actions
 
 
-def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
+def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, our_idx):
     total_reward = np.zeros(2)
     num_win = np.zeros(3)  # agent 1 win, agent 2 win, draw
     episode = int(episode)
@@ -69,7 +69,17 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
         episode_reward = np.zeros(2)
 
         state = env.reset(shuffle_map)
-        state_buffers = [[np.zeros((25, 25)) for _ in range(args.num_frame - 1)] for i in range(len(agent_list))]
+        if our_idx == 0:
+            state_buffers = [
+                [np.zeros((25, 25)) for _ in range(args.num_frame - 1)],
+                [np.zeros((25, 25)) for _ in range(args.oppo_num_frame - 1)]
+            ]
+        else:
+            state_buffers = [
+                [np.zeros((25, 25)) for _ in range(args.oppo_num_frame - 1)],
+                [np.zeros((25, 25)) for _ in range(args.num_frame - 1)],
+            ]
+
         for j in range(len(agent_list)):
             obs_agent = np.array(state[j]["obs"])
             state_buffers[j].insert(0, obs_agent)
@@ -82,7 +92,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
         while True:
             # print(step, end='\t')
             joint_action = get_join_actions(state_buffers, agent_list)
-            next_state, reward, done, _, info = env.step(joint_action)
+            next_state, reward, done, _, info = env.step(joint_action, np.array(state_buffers).__contains__(4))
             reward = np.array(reward)
             episode_reward += reward
             if render:
@@ -90,11 +100,11 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
 
             if done:
                 # if reward[0] != reward[1]:
-                    # if reward[0] == 100:
+                # if reward[0] == 100:
                 if env.env_core.agent_list[0].finished:
                     num_win[0] += 1
                 elif env.env_core.agent_list[1].finished:
-                # elif reward[1] == 100:
+                    # elif reward[1] == 100:
                     num_win[1] += 1
                 else:
                     # print('both have not reached 100 reward')
@@ -152,7 +162,13 @@ if __name__ == "__main__":
 
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
     parser.add_argument('--critic_hidden_layers', type=int, default=2)
+
+    parser.add_argument('--oppo_actor_hidden_layers', type=int, default=1)
+    parser.add_argument('--oppo_critic_hidden_layers', type=int, default=1)
     parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
+    parser.add_argument("--oppo_num_frame", default=1, type=int, help="number of frames(states) in one time step")
+    parser.add_argument("--oppo_use_cnn", default=False, action='store_true', help="number of frames(states) in one time step")
+
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
 
     parser.add_argument('--reverse', action='store_true', help='if true, then green is ours')
@@ -179,15 +195,21 @@ if __name__ == "__main__":
         else:
             algo.state_space = args.num_frame * 625
         agent = algo(actor_hidden_layers=args.actor_hidden_layers,
-                                     critic_hidden_layers=args.critic_hidden_layers)
+                     critic_hidden_layers=args.critic_hidden_layers)
         agent.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
         agent_list.append(agent)
     else:
         agent_list.append(random_agent(args.seed))
 
     if args.opponent != "random":
-        agent = algo_map[args.opponent](actor_hidden_layers=args.actor_hidden_layers,
-                                        critic_hidden_layers=args.critic_hidden_layers)
+        algo = algo_map[args.opponent]
+        algo.use_cnn = args.oppo_use_cnn
+        if algo.use_cnn:
+            algo.num_frame = args.oppo_num_frame
+        else:
+            algo.state_space = args.oppo_num_frame * 625
+        agent = algo(actor_hidden_layers=args.oppo_actor_hidden_layers,
+                     critic_hidden_layers=args.oppo_critic_hidden_layers)
         agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
         agent_list.append(agent)
     else:
@@ -196,10 +218,12 @@ if __name__ == "__main__":
     # NOTE: [our ai, random]
 
     # ================ revert order
+    our_agent_idx = 0
     if args.reverse:
         print('Green is the controlled')
         algo_list = list(reversed(algo_list))
         agent_list = list(reversed(agent_list))
+        our_agent_idx = 1
     else:
         print('Purple is the controlled')
 
@@ -211,4 +235,5 @@ if __name__ == "__main__":
         shuffle_map=shuffle,
         map_num=args.map,
         render=args.render,
+        our_idx=our_agent_idx
     )
