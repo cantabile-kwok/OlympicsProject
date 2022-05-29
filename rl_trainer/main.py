@@ -118,11 +118,45 @@ def get_args():
     parser.add_argument("--num_frame", default=1, type=int, help="number of frames(states) in one time step")
     parser.add_argument("--use_cnn", action='store_true', help="whether use cnn network")
     parser.add_argument('--train_by_win', action='store_true')
+# <<<<<<< HEAD
     parser.add_argument("--use_step_dist", action='store_true')
+# =======
+    parser.add_argument('--shuffle_place', action='store_true', help="whether shuffle start place")
+# >>>>>>> main
 
     return parser.parse_args()
 
 
+# <<<<<<< HEAD
+# =======
+def load_model(algo, run_dir, load_episode, device="cpu"):
+    model = algo(device)
+    load_dir = os.path.join(run_dir)
+    model.load(load_dir, load_episode)
+    return model
+
+
+def choose_agent(episode, onlinemodel, pool:agent_pool, p=0.5, device='cpu', args=None):
+    # TODO: add args into sample()
+    # to do : self play
+    # online model 当前训练的模型
+    # pool 历史模型池
+    # p 控制使用的模型是随机的还是
+    # if episode<100:
+    #     return frozen_agent()
+    if episode < 100:
+        return frozen_agent(), -1
+    if episode < 500:
+        return random_agent(), -1
+    if episode < 2000:
+        if random.uniform(0, 1) < p:
+            # return load_model(PPO,dir,episode//100*100,device)
+            return pool.sample(args=args)
+        else:
+            return onlinemodel, -1
+
+
+# >>>>>>> main
 def main(args):
     run_dir, log_dir = make_logpath(args.game_name, args.algo)
     run_dir = os.path.join(os.path.dirname(run_dir), args.run_dir)
@@ -200,11 +234,33 @@ def main(args):
 
     episode = 0
     train_count = 0
+# <<<<<<< HEAD
+# =======
+
+    # ================ NOTE: optionally add an existing model into agent pool =================
+    # op_dir = os.path.join(os.path.dirname(run_dir), "run" + str(9))  # use run9,just for test
+    # Agent_pool.add(op_dir, 500)
+    # =========================================================================================
+# >>>>>>> main
 
     with tqdm(range(args.max_episodes)) as pbar:
         while episode < args.max_episodes:
             state = env.reset(args.shuffle_map)
             state_buffer = [np.zeros((25, 25)) for _ in range(args.num_frame - 1)]
+# <<<<<<< HEAD
+# =======
+            state_buffer_for_oppo = [np.zeros((25, 25)) for _ in range(args.num_frame - 1)]
+
+            if args.shuffle_place:
+                ctrl_agent_index = random.randint(0, 1)
+
+            opponent_agent, index = choose_agent(episode, onlinemodel=model,
+                                                 pool=Agent_pool,
+                                                 device=args.device,
+                                                 args=args
+                                                 )
+            # when index =-1 ，说明未从pool中取
+# >>>>>>> main
             if args.render:
                 env.env_core.render()
             obs_ctrl_agent = np.array(state[ctrl_agent_index]["obs"])
@@ -251,6 +307,7 @@ def main(args):
                         post_reward = [-1.0, -1.0]  # NOTE: non relevant to dist
                     else:
                         post_reward = reward  # NOTE: adopt step-level dist reward
+
                 else:
                     if reward[0] != reward[1]:
                         post_reward = (
@@ -303,10 +360,19 @@ def main(args):
                         "%.2f" % (sum(record_win_op) / len(record_win_op)),
                         "; Trained episode:",
                         train_count,
+                        ";Result:",
+                        (win_is, win_is_op),
                         file=log_file,
                         flush=True
                     )
-
+                    # win_r = sum(record_win) / len(record_win)
+                    win_r = int(win_is > win_is_op)
+                    print(win_r, file=log_file)
+                    # win_r = 0.6 #just for test
+                    if win_r > 0.5 and index >= 0:
+                        # update pool
+                        Agent_pool.update(index, win_r)
+# >>>>>>> main
                     if not args.load_model:
                         if args.algo == "ppo":
                             if args.train_by_win:

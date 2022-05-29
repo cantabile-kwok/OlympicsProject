@@ -1,5 +1,5 @@
-{'game_name': 'olympics-running', 'algo': 'ppo', 'max_episodes': 1500, 'episode_length': 500, 'map': 1, 'shuffle_map': False, 'buffer_capacity': 3000, 'seed': 1, 'device': 'cpu', 'save_interval': 100, 'render': False, 'load_model': False, 'load_run': 2, 'load_episode': 900, 'run_dir': 'tmp', 'actor_hidden_layers': 1, 'critic_hidden_layers': 1, 'num_frame': 1, 'use_cnn': True, 'train_by_win': False, 'use_step_dist': False}
-{'class_literal': 'OlympicsRunning', 'n_player': 2, 'max_step': 500, 'game_name': 'running', 'is_obs_continuous': True, 'is_act_continuous': True, 'agent_nums': [1, 1], 'obs_type': ['vector', 'vector'], 'map_num': 11, 'use_map_dist': True, 'use_hit_wall': False, 'use_cross': True}
+{'game_name': 'olympics-running', 'algo': 'ppo', 'max_episodes': 3000, 'episode_length': 500, 'map': 1, 'shuffle_map': False, 'seed': 1, 'device': 'cpu', 'save_interval': 100, 'render': False, 'load_model': False, 'load_run': 2, 'load_episode': 900, 'run_dir': 'tmp', 'actor_hidden_layers': 2, 'critic_hidden_layers': 1, 'num_frame': 1, 'use_cnn': False, 'train_by_win': False, 'shuffle_place': False}
+{'class_literal': 'OlympicsRunning', 'n_player': 2, 'max_step': 500, 'game_name': 'running', 'is_obs_continuous': True, 'is_act_continuous': True, 'agent_nums': [1, 1], 'obs_type': ['vector', 'vector'], 'map_num': 11, 'use_map_dist': True, 'use_hit_wall': False}
 Total agent number: 2
 Agent control by the actor: 1
 Game board width: 700
@@ -7,10 +7,8 @@ Game board height: 700
 action dimension: [[Box(-100.0, 200.0, (1,), float32), Box(-30.0, 30.0, (1,), float32)], [Box(-100.0, 200.0, (1,), float32), Box(-30.0, 30.0, (1,), float32)]]
 observation dimension: 625
 store in /Users/cantabile/Desktop/学期文件/大三下/博弈论与多智能体学习/OlympicsProject/rl_trainer/models/olympics-running/ppo/tmp
-Use CNN: True
-Episode:  1 controlled agent:  1 ; Episode Return:  -763.0633801895613 ; win rate(controlled & opponent):  0.00 1.00 ; Trained episode: 0
-Episode:  2 controlled agent:  1 ; Episode Return:  -1021.7095938490367 ; win rate(controlled & opponent):  0.50 0.50 ; Trained episode: 0
-Episode:  3 controlled agent:  1 ; Episode Return:  -81.31370849898474 ; win rate(controlled & opponent):  0.67 0.33 ; Trained episode: 0
-Episode:  4 controlled agent:  1 ; Episode Return:  -443.7523518251459 ; win rate(controlled & opponent):  0.50 0.50 ; Trained episode: 0
-Episode:  5 controlled agent:  1 ; Episode Return:  -716.8822509939084 ; win rate(controlled & opponent):  0.40 0.60 ; Trained episode: 0
-Episode:  6 controlled agent:  1 ; Episode Return:  -319.94975172648157 ; win rate(controlled & opponent):  0.33 0.67 ; Trained episode: 0
+Use CNN: False
+Episode:  1 controlled agent:  1 ; Episode Return:  -190.3847763108502 ; win rate(controlled & opponent):  1.00 0.00 ; Trained episode: 0 ;Result: (1, 0)
+1
+Episode:  2 controlled agent:  1 ; Episode Return:  -1085.5979797464465 ; win rate(controlled & opponent):  0.50 0.50 ; Trained episode: 1 ;Result: (0, 1)
+0

@@ -65,6 +65,8 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
     total_reward = np.zeros(2)
     num_win = np.zeros(3)  # agent 1 win, agent 2 win, draw
     episode = int(episode)
+    num_final_reward_win = np.zeros(3)
+
     for i in tqdm(range(1, int(episode) + 1)):
         episode_reward = np.zeros(2)
 
@@ -122,6 +124,12 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
                 state_buffers[k].insert(0, obs)
 
             step += 1
+        if reward[0] > reward[1]:
+            num_final_reward_win[0] += 1
+        elif reward[1] > reward[0]:
+            num_final_reward_win[1] += 1
+        else:
+            num_final_reward_win[2] += 1
         total_reward += episode_reward
     total_reward /= episode
     print("total reward: ", total_reward)
@@ -131,6 +139,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
     data = [
         ["score", np.round(total_reward[0], 2), np.round(total_reward[1], 2)],
         ["win", num_win[0], num_win[1]],
+        ['final-reward-win', num_final_reward_win[0], num_final_reward_win[1]]
     ]
     print(tabulate(data, headers=header, tablefmt="pretty"))
 
@@ -210,6 +219,7 @@ if __name__ == "__main__":
             algo.state_space = args.oppo_num_frame * 625
         agent = algo(actor_hidden_layers=args.oppo_actor_hidden_layers,
                      critic_hidden_layers=args.oppo_critic_hidden_layers)
+
         agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
         agent_list.append(agent)
     else:
