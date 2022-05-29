@@ -301,7 +301,7 @@ def main(args):
                     if ctrl_agent_index == 1
                     else [action_ctrl, action_opponent]
                 )
-                next_state, reward, done, _, info = env.step(action, np.array(state_buffer).__contains__(4))
+                next_state, reward, done, _, info, dist_reward = env.step(action, np.array(state_buffer).__contains__(4))
 
                 next_obs_ctrl_agent = next_state[ctrl_agent_index]["obs"]
                 next_obs_oppo_agent = next_state[1 - ctrl_agent_index]["obs"]
@@ -351,10 +351,10 @@ def main(args):
 
                 if done:
                     win_is = (
-                        1 if reward[ctrl_agent_index] > reward[1 - ctrl_agent_index] else 0
+                        1 if dist_reward[ctrl_agent_index] > dist_reward[1 - ctrl_agent_index] else 0
                     )
                     win_is_op = (
-                        1 if reward[ctrl_agent_index] < reward[1 - ctrl_agent_index] else 0
+                        1 if dist_reward[ctrl_agent_index] < dist_reward[1 - ctrl_agent_index] else 0
                     )
                     record_win.append(win_is)
                     record_win_op.append(win_is_op)

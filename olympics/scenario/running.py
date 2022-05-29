@@ -46,6 +46,7 @@ class Running(OlympicsBase):
         # ========================================================
 
         # ==================== Distance related ==================
+        return_dist_rewards = np.array([0 for _ in range(self.agent_num)])
         if self.use_map_dist:
             if hasattr(self, "map_dist"):
                 map_dist = self.map_dist
@@ -70,8 +71,11 @@ class Running(OlympicsBase):
                             break
                     map_dist[int(agent_pos[1]), int(agent_pos[0])] = dist_this_pos
 
-                reward_this_pos = -dist_this_pos
+                dist_norm_factor = 100  # NOTE: divide !
+                reward_this_pos = -dist_this_pos / dist_norm_factor
                 agent_reward[agent_i] += reward_this_pos
+                return_dist_rewards[agent_i] = reward_this_pos
+
             self.map_dist = map_dist
         # ========================================================
 
@@ -90,7 +94,7 @@ class Running(OlympicsBase):
 
         # ================= Cross? =================
         if self.use_cross:
-            cross_penalty = 50
+            cross_penalty = 10  # NOTE: multiply by this
             if cross:
                 cross_list = self.cross_pos['map' + str(self.map_num)]
                 cross_pos = [cross_list[i][0] for i in range(len(cross_list))]
@@ -113,7 +117,7 @@ class Running(OlympicsBase):
 
         # ==========================================
 
-        return agent_reward
+        return agent_reward, return_dist_rewards
 
     def is_terminal(self):
 
@@ -139,7 +143,7 @@ class Running(OlympicsBase):
         self.cross_detect(previous_pos, self.agent_pos)
 
         self.step_cnt += 1
-        step_reward = self.get_reward(cross)
+        step_reward, dist_reward = self.get_reward(cross)
         done = self.is_terminal()
 
         time3 = time.time()
@@ -150,7 +154,7 @@ class Running(OlympicsBase):
         # self.check_overlap()
         self.change_inner_state()
 
-        return obs_next, step_reward, done, ""
+        return obs_next, step_reward, done, "", dist_reward
 
     def store_cross_pos(self):
         cross_pos = dict()

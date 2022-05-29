@@ -94,7 +94,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
         while True:
             # print(step, end='\t')
             joint_action = get_join_actions(state_buffers, agent_list)
-            next_state, reward, done, _, info = env.step(joint_action, np.array(state_buffers).__contains__(4))
+            next_state, reward, done, _, info, dist_reward = env.step(joint_action, np.array(state_buffers).__contains__(4))
             reward = np.array(reward)
             episode_reward += reward
             if render:
@@ -124,9 +124,9 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
                 state_buffers[k].insert(0, obs)
 
             step += 1
-        if reward[0] > reward[1]:
+        if dist_reward[0] > dist_reward[1]:
             num_final_reward_win[0] += 1
-        elif reward[1] > reward[0]:
+        elif dist_reward[1] > dist_reward[0]:
             num_final_reward_win[1] += 1
         else:
             num_final_reward_win[2] += 1
