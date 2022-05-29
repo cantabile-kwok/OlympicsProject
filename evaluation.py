@@ -65,6 +65,8 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
     total_reward = np.zeros(2)
     num_win = np.zeros(3)  # agent 1 win, agent 2 win, draw
     episode = int(episode)
+    num_final_reward_win = np.zeros(3)
+
     for i in tqdm(range(1, int(episode) + 1)):
         episode_reward = np.zeros(2)
 
@@ -90,11 +92,11 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
 
             if done:
                 # if reward[0] != reward[1]:
-                    # if reward[0] == 100:
+                # if reward[0] == 100:
                 if env.env_core.agent_list[0].finished:
                     num_win[0] += 1
                 elif env.env_core.agent_list[1].finished:
-                # elif reward[1] == 100:
+                    # elif reward[1] == 100:
                     num_win[1] += 1
                 else:
                     # print('both have not reached 100 reward')
@@ -112,6 +114,12 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
                 state_buffers[k].insert(0, obs)
 
             step += 1
+        if reward[0] > reward[1]:
+            num_final_reward_win[0] += 1
+        elif reward[1] > reward[0]:
+            num_final_reward_win[1] += 1
+        else:
+            num_final_reward_win[2] += 1
         total_reward += episode_reward
     total_reward /= episode
     print("total reward: ", total_reward)
@@ -121,6 +129,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render):
     data = [
         ["score", np.round(total_reward[0], 2), np.round(total_reward[1], 2)],
         ["win", num_win[0], num_win[1]],
+        ['final-reward-win', num_final_reward_win[0], num_final_reward_win[1]]
     ]
     print(tabulate(data, headers=header, tablefmt="pretty"))
 
@@ -147,7 +156,7 @@ if __name__ == "__main__":
         "--map",
         default="all",
     )
-    parser.add_argument("--render", type=bool, default=True)
+    parser.add_argument("--render", type=bool, default=False)
     parser.add_argument("--seed", default=123)
 
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
@@ -179,7 +188,7 @@ if __name__ == "__main__":
         else:
             algo.state_space = args.num_frame * 625
         agent = algo(actor_hidden_layers=args.actor_hidden_layers,
-                                     critic_hidden_layers=args.critic_hidden_layers)
+                     critic_hidden_layers=args.critic_hidden_layers)
         agent.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
         agent_list.append(agent)
     else:
