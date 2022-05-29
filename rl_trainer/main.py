@@ -237,7 +237,7 @@ def main(args):
                     if ctrl_agent_index == 1
                     else [action_ctrl, action_opponent]
                 )
-                next_state, reward, done, _, info = env.step(action)
+                next_state, reward, done, _, info = env.step(action, np.array(state_buffer).__contains__(4))
 
                 next_obs_ctrl_agent = next_state[ctrl_agent_index]["obs"]
                 next_obs_oppo_agent = next_state[1 - ctrl_agent_index]["obs"]

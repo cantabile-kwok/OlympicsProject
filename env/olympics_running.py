@@ -40,6 +40,10 @@ class OlympicsRunning(Game):
         self.use_hit_wall = conf['use_hit_wall']
         # ==============================================================
 
+        # =================== Use cross? ============================
+        self.use_cross = conf['use_cross']
+        # ==============================================================
+
         # choose a map randomly
         self.num_map = conf["map_num"]
         map_index_seq = list(range(1, conf["map_num"] + 1))
@@ -48,7 +52,8 @@ class OlympicsRunning(Game):
 
         self.env_core = Running(Gamemap,
                                 use_map_dist=self.use_map_dist,
-                                use_hit_wall=self.use_hit_wall)
+                                use_hit_wall=self.use_hit_wall,
+                                use_cross=self.use_cross)
         self.max_step = int(conf["max_step"])
         self.joint_action_space = self.set_action_space()
         self.action_dim = self.joint_action_space
@@ -90,7 +95,8 @@ class OlympicsRunning(Game):
         Gamemap = create_scenario("map" + str(num))
         self.env_core = Running(Gamemap,
                                 use_map_dist=self.use_map_dist,
-                                use_hit_wall=self.use_hit_wall)
+                                use_hit_wall=self.use_hit_wall,
+                                use_cross=self.use_cross)
         _ = self.reset()
         self.env_core.map_num = num
 
@@ -102,7 +108,8 @@ class OlympicsRunning(Game):
             Gamemap = create_scenario("map" + str(rand_map_idx))
             self.env_core = Running(Gamemap,
                                     use_map_dist=self.use_map_dist,
-                                    use_hit_wall=self.use_hit_wall)
+                                    use_hit_wall=self.use_hit_wall,
+                                    use_cross=self.use_cross)
             self.env_core.map_num = rand_map_idx
 
         self.env_core.reset()
@@ -117,12 +124,12 @@ class OlympicsRunning(Game):
 
         return self.all_observes
 
-    def step(self, joint_action):
+    def step(self, joint_action, cross_exist):
         self.is_valid_action(joint_action)
         info_before = self.step_before_info()
         joint_action_decode = self.decode(joint_action)
         all_observations, reward, done, info_after = self.env_core.step(
-            joint_action_decode
+            joint_action_decode, cross_exist
         )
         info_after = ""
         self.current_state = all_observations

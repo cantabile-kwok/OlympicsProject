@@ -3,10 +3,12 @@ import itertools
 from olympics.core import OlympicsBase
 import time
 import numpy as np
+import json
+from math import sqrt
 
 
 class Running(OlympicsBase):
-    def __init__(self, map, seed=None, use_map_dist=False, use_hit_wall=False):
+    def __init__(self, map, seed=None, use_map_dist=False, use_hit_wall=False, use_cross=False):
         super(Running, self).__init__(map, seed)
 
         self.gamma = 1  # v衰减系数
@@ -22,14 +24,16 @@ class Running(OlympicsBase):
 
         self.use_map_dist = use_map_dist
         self.use_hit_wall = use_hit_wall
+        self.use_cross = use_cross
 
+        self.cross_pos = self.store_cross_pos()
         # self.is_render = True
 
     def check_overlap(self):
         # todo
         pass
 
-    def get_reward(self):
+    def get_reward(self, cross):
 
         # print(self.hit_wall[0])  # FIXME
 
@@ -84,6 +88,30 @@ class Running(OlympicsBase):
 
         # ==========================================
 
+        # ================= Cross? =================
+        if self.use_cross:
+            cross_penalty = 50
+            if cross:
+                cross_list = self.cross_pos['map' + str(self.map_num)]
+                cross_pos = [cross_list[i][0] for i in range(len(cross_list))]
+                for agent_i in range(self.agent_num):
+                    dist = 1e10
+                    index = None
+                    for i, pos in enumerate(cross_pos):
+                        tmp_dist = (pos[0] - self.agent_pos[agent_i][0]) ** 2 + (pos[1] - self.agent_pos[agent_i][1]) ** 2
+                        if tmp_dist < dist:
+                            dist = tmp_dist
+                            index = i
+                    crs_pos = cross_list[index]
+                    mid = [(crs_pos[1][0] + crs_pos[2][0]) / 2, (crs_pos[1][1] + crs_pos[2][1]) / 2]
+                    direction = [crs_pos[0][0] - mid[0], crs_pos[0][1] - mid[1]]
+                    weight = direction[0] * self.agent_v[agent_i][0] + direction[1] * self.agent_v[agent_i][1]
+                    weight /= sqrt(direction[0] ** 2 + direction[1] ** 2) * sqrt(self.agent_v[agent_i][0] ** 2 + self.agent_v[agent_i][1] ** 2)
+                    weighted_penalty = weight * cross_penalty
+                    agent_reward[agent_i] += weighted_penalty
+
+        # ==========================================
+
         return agent_reward
 
     def is_terminal(self):
@@ -97,7 +125,7 @@ class Running(OlympicsBase):
 
         return False
 
-    def step(self, actions_list):
+    def step(self, actions_list, cross):
 
         previous_pos = self.agent_pos
 
@@ -110,7 +138,7 @@ class Running(OlympicsBase):
         self.cross_detect(previous_pos, self.agent_pos)
 
         self.step_cnt += 1
-        step_reward = self.get_reward()
+        step_reward = self.get_reward(cross)
         done = self.is_terminal()
 
         time3 = time.time()
@@ -122,3 +150,18 @@ class Running(OlympicsBase):
         self.change_inner_state()
 
         return obs_next, step_reward, done, ""
+
+    def store_cross_pos(self):
+        cross_pos = dict()
+        with open('olympics/maps.json') as f:
+            map_dict = json.load(f)
+        for k in map_dict.keys():
+            cross_pos[k] = []
+            cross_obj = map_dict[k]['cross']['objects']
+            keys = list(cross_obj.keys())
+            if len(keys) > 1:
+                for num in range(1, len(keys), 2):
+                    key_1 = keys[num]
+                    key_2 = keys[num + 1]
+                    cross_pos[k].append([cross_obj[key_1]['initial_position'][1], cross_obj[key_1]['initial_position'][0], cross_obj[key_2]['initial_position'][0]])
+        return cross_pos
