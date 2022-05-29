@@ -140,7 +140,8 @@ def load_model(algo, run_dir, load_episode, device="cpu"):
     return model
 
 
-def choose_agent(episode, onlinemodel, pool, p=0.5, device='cpu'):
+def choose_agent(episode, onlinemodel, pool:agent_pool, p=0.5, device='cpu', args=None):
+    # TODO: add args into sample()
     # to do : self play
     # online model 当前训练的模型
     # pool 历史模型池
@@ -154,7 +155,7 @@ def choose_agent(episode, onlinemodel, pool, p=0.5, device='cpu'):
     if episode < 2000:
         if random.uniform(0, 1) < p:
             # return load_model(PPO,dir,episode//100*100,device)
-            return pool.sample()
+            return pool.sample(args=args)
         else:
             return onlinemodel, -1
 
@@ -257,7 +258,11 @@ def main(args):
 
             # =======
 
-            opponent_agent, index = choose_agent(episode, onlinemodel=model, pool=Agent_pool, device=args.device)
+            opponent_agent, index = choose_agent(episode, onlinemodel=model,
+                                                 pool=Agent_pool,
+                                                 device=args.device,
+                                                 args=args
+                                                 )
             # when index =-1 ，说明未从pool中取
             # >>>>>>> zmz
             if args.render:
