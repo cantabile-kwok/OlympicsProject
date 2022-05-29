@@ -1,4 +1,4 @@
-import _io
+# import _io
 import argparse
 import datetime
 import os.path
@@ -6,11 +6,10 @@ import random
 import sys
 from copy import deepcopy
 from pathlib import Path
-from pprint import pprint
+# from pprint import pprint
 from typing import Dict
 from tqdm import tqdm
-from rl_trainer.algo.pool import agent_pool
-
+import shutil
 import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -28,7 +27,9 @@ from env.chooseenv import make
 
 from rl_trainer.algo.ppo import PPO
 from rl_trainer.algo.random import random_agent
+from rl_trainer.algo.rule import frozen_agent
 from rl_trainer.log_path import *
+from rl_trainer.algo.pool import agent_pool
 
 actions_map = {
     0: [-100, -30],
@@ -73,6 +74,10 @@ algo_name_list = ["ppo"]
 algo_list = [PPO]
 algo_map = dict(zip(algo_name_list, algo_list))
 
+# <<<<<<< HEAD
+BEGIN_SAVE = 300
+
+
 
 def get_game(seed: int = None, config: Dict = None, log_file=None):
     return make("olympics-running", seed, config, log_file=log_file)
@@ -97,7 +102,7 @@ def get_args():
         choices=algo_name_list,
     )
 
-    parser.add_argument("--max_episodes", default=1500, type=int)
+    parser.add_argument("--max_episodes", default=3000, type=int)
     parser.add_argument("--episode_length", default=500, type=int)
     parser.add_argument(
         "--map", default=1, type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -204,6 +209,7 @@ def main(args):
         )
         save_config(args, log_dir)
 
+    shutil.copyfile('rl_trainer/main.py', os.path.join(run_dir, 'main.py'))
     record_win = deque(maxlen=100)
     record_win_op = deque(maxlen=100)
 
@@ -229,6 +235,7 @@ def main(args):
         )
 
     opponent_agent = random_agent()  # we use random opponent agent here
+    Agent_pool = agent_pool(args.device)
 
     episode = 0
     train_count = 0
@@ -245,8 +252,7 @@ def main(args):
         while episode < args.max_episodes:
             state = env.reset(args.shuffle_map)
             state_buffer = [np.zeros((25, 25)) for _ in range(args.num_frame - 1)]
-# <<<<<<< HEAD
-# =======
+
             state_buffer_for_oppo = [np.zeros((25, 25)) for _ in range(args.num_frame - 1)]
 
             if args.shuffle_place:
@@ -258,13 +264,13 @@ def main(args):
                                                  args=args
                                                  )
             # when index =-1 ，说明未从pool中取
-# >>>>>>> main
             if args.render:
                 env.env_core.render()
             obs_ctrl_agent = np.array(state[ctrl_agent_index]["obs"])
             state_buffer.insert(0, obs_ctrl_agent)
 
-            obs_oppo_agent = state[1 - ctrl_agent_index]["obs"]
+            obs_oppo_agent = np.array(state[1 - ctrl_agent_index]["obs"])  # 为了适应self play的情况
+            state_buffer_for_oppo.insert(0, obs_oppo_agent)
 
             episode += 1
             pbar.update()
@@ -273,8 +279,11 @@ def main(args):
 
             while True:
                 action_opponent = opponent_agent.choose_action(
-                    obs_oppo_agent
-                )  # opponent action
+                    np.array(state_buffer_for_oppo)
+                )  # opponent action'
+                if isinstance(action_opponent, int):  # for ppo opponent
+                    action_opponent = actions_map[action_opponent]
+                    action_opponent = [[action_opponent[0]], [action_opponent[1]]]
                 # action_opponent = [
                 #     [0],
                 #     [0],
@@ -316,11 +325,14 @@ def main(args):
                     else:
                         post_reward = [-1.0, -1.0]
 
-                obs_oppo_agent = next_obs_oppo_agent
+                obs_oppo_agent = np.array(next_obs_oppo_agent)
                 obs_ctrl_agent = np.array(next_obs_ctrl_agent)
                 last_state = deepcopy(state_buffer)
                 state_buffer.pop(-1)
                 state_buffer.insert(0, obs_ctrl_agent)
+                state_buffer_for_oppo.pop(-1)
+                state_buffer_for_oppo.insert(0, obs_oppo_agent)
+
 
                 if not args.load_model:
                     trans = Transition(
@@ -394,6 +406,8 @@ def main(args):
                     break
             if episode % args.save_interval == 0 and not args.load_model:
                 model.save(run_dir, episode)
+                if episode >= BEGIN_SAVE:
+                    Agent_pool.add(run_dir, episode)
                 log_file.flush()
 
     log_file.close()

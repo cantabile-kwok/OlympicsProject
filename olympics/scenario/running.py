@@ -106,7 +106,8 @@ class Running(OlympicsBase):
                     mid = [(crs_pos[1][0] + crs_pos[2][0]) / 2, (crs_pos[1][1] + crs_pos[2][1]) / 2]
                     direction = [crs_pos[0][0] - mid[0], crs_pos[0][1] - mid[1]]
                     weight = direction[0] * self.agent_v[agent_i][0] + direction[1] * self.agent_v[agent_i][1]
-                    weight /= sqrt(direction[0] ** 2 + direction[1] ** 2) * sqrt(self.agent_v[agent_i][0] ** 2 + self.agent_v[agent_i][1] ** 2)
+                    eps = 1e-7
+                    weight /= sqrt(direction[0] ** 2 + direction[1] ** 2) * sqrt(self.agent_v[agent_i][0] ** 2 + self.agent_v[agent_i][1] ** 2) + eps
                     weighted_penalty = weight * cross_penalty
                     agent_reward[agent_i] += weighted_penalty
 
