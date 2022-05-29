@@ -4,14 +4,8 @@ from rl_trainer.algo.ppo import PPO
 import torch
 
 
-def load_model(run_dir, load_episode, device="cpu", algo=PPO, args=None):
-    # TODO: add args into this func, and if algo == PPO, then pass actor_hidden_layers, critic_hidden_layers.
-    if algo == PPO:
-        model = algo(device, actor_hidden_layers=args.actor_hidden_layers,
-                     critic_hidden_layers=args.critic_hidden_layers)
-    else:
-        model = algo(device)
-
+def load_model(run_dir, load_episode, device="cpu", algo=PPO):
+    model = algo(device)
     load_dir = os.path.join(run_dir)
     model.load(load_dir, load_episode)
     return model
@@ -32,12 +26,11 @@ class agent_pool(object):
         self.prob = torch.softmax(torch.tensor(self.quality_score), 0).tolist()
         self.index += 1
 
-    def sample(self, args=None):
-        # TODO: add args into load_model
+    def sample(self):
         index = np.random.choice(self.index, p=np.array(self.prob) / np.array(self.prob).sum())
         dir = self.pool[index]['dir']
         episode = self.pool[index]['episode']
-        return load_model(dir, episode, device=self.device, args=args), index
+        return load_model(dir, episode, device=self.device), index
 
     def reset(self):
         self.pool = {}
