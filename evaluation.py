@@ -205,6 +205,14 @@ if __name__ == "__main__":
             algo.state_space = args.num_frame * 625
         agent = algo(actor_hidden_layers=args.actor_hidden_layers,
                      critic_hidden_layers=args.critic_hidden_layers)
+        # ========== copy from class member to instance member to avoid overwriting ========
+        agent.use_cnn = args.use_cnn
+        if agent.use_cnn:
+            agent.num_frame = args.num_frame
+        else:
+            agent.state_space = args.num_frame * 625
+        # ===================================================================================
+
         agent.load(args.my_ai_run_dir, int(args.my_ai_run_episode))
         agent_list.append(agent)
     else:
@@ -219,6 +227,13 @@ if __name__ == "__main__":
             algo.state_space = args.oppo_num_frame * 625
         agent = algo(actor_hidden_layers=args.oppo_actor_hidden_layers,
                      critic_hidden_layers=args.oppo_critic_hidden_layers)
+        # ========== copy from class member to instance member to avoid overwriting ========
+        agent.use_cnn = args.oppo_use_cnn
+        if agent.use_cnn:
+            agent.num_frame = args.oppo_num_frame
+        else:
+            agent.state_space = args.oppo_num_frame * 625
+        # ===================================================================================
 
         agent.load(args.opponent_run_dir, int(args.opponent_run_episode))
         agent_list.append(agent)
