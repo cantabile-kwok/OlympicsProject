@@ -22,7 +22,7 @@ class Args:
     gae_lambda = 0.95
     clip_param = 0.2
     max_grad_norm = 0.5
-    ppo_update_time = 5
+    ppo_update_time = 10
     buffer_capacity = 3000
     batch_size = 2000
     gamma = 0.99

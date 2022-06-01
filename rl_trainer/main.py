@@ -103,7 +103,7 @@ def get_args():
     )
 
     parser.add_argument("--max_episodes", default=3000, type=int)
-    parser.add_argument("--episode_length", default=500, type=int)
+    parser.add_argument("--episode_length", default=1000, type=int)
     parser.add_argument(
         "--map", default=1, type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     )
