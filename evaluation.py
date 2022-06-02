@@ -175,7 +175,7 @@ if __name__ == "__main__":
         "--map",
         default="all",
     )
-    parser.add_argument("--render", type=bool, default=False)
+    parser.add_argument("--render", type=bool, default=True)
     parser.add_argument("--seed", default=123)
 
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
