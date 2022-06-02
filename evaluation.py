@@ -66,6 +66,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
     num_win = np.zeros(3)  # agent 1 win, agent 2 win, draw
     episode = int(episode)
     num_final_reward_win = np.zeros(3)
+    num_finish_steps = np.zeros(2)
 
     for i in tqdm(range(1, int(episode) + 1)):
         episode_reward = np.zeros(2)
@@ -105,14 +106,20 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
                 # if reward[0] == 100:
                 if env.env_core.agent_list[0].finished:
                     num_win[0] += 1
+                    num_finish_steps[0] += step
+                    num_finish_steps[1] += 500
                 elif env.env_core.agent_list[1].finished:
                     # elif reward[1] == 100:
                     num_win[1] += 1
+                    num_finish_steps[1] += step
+                    num_finish_steps[0] += 500
                 else:
                     # print('both have not reached 100 reward')
                     # raise NotImplementedError
                     # FIXME
                     num_win[2] += 1
+                    num_finish_steps[0] += 500
+                    num_finish_steps[1] += 500
 
                 # else:
                 break
@@ -132,6 +139,7 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
             num_final_reward_win[2] += 1
         total_reward += episode_reward
     total_reward /= episode
+    num_finish_steps /= episode
     print("total reward: ", total_reward)
     print("Result in map {} within {} episode:".format(map_num, episode))
 
@@ -139,7 +147,8 @@ def run_game(env, algo_list, agent_list, episode, shuffle_map, map_num, render, 
     data = [
         ["score", np.round(total_reward[0], 2), np.round(total_reward[1], 2)],
         ["win", num_win[0], num_win[1]],
-        ['final-reward-win', num_final_reward_win[0], num_final_reward_win[1]]
+        ['final-reward-win', num_final_reward_win[0], num_final_reward_win[1]],
+        ['avg num steps', num_finish_steps[0], num_finish_steps[1]]
     ]
     print(tabulate(data, headers=header, tablefmt="pretty"))
 
@@ -166,7 +175,7 @@ if __name__ == "__main__":
         "--map",
         default="all",
     )
-    parser.add_argument("--render", type=bool, default=True)
+    parser.add_argument("--render", type=bool, default=False)
     parser.add_argument("--seed", default=123)
 
     parser.add_argument('--actor_hidden_layers', type=int, default=2)
@@ -222,7 +231,7 @@ if __name__ == "__main__":
         algo = algo_map[args.opponent]
         algo.use_cnn = args.oppo_use_cnn
         if algo.use_cnn:
-            algo.num_frame = args.oppo_num_frame
+            algo.num_frame = args.oppo_num_framee
         else:
             algo.state_space = args.oppo_num_frame * 625
         agent = algo(actor_hidden_layers=args.oppo_actor_hidden_layers,

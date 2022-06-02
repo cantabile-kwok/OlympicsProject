@@ -103,6 +103,7 @@ class PPO:
             action = c.sample()
         else:
             action = torch.argmax(action_prob)
+            # action = c.sample()  # NOTE: changed to sample !!
         return action.cpu().item(), action_prob[:, action.item()].item()
 
     def choose_action(self, state, train=False):
